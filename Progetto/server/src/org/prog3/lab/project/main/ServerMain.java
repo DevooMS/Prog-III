@@ -52,7 +52,7 @@ public class ServerMain {
                             loginThreads.execute(loginTask);
                             break;
                         case "update":
-                            String directoryPath = "C:\\Users\\nicol\\Documents\\Prog III lab\\Progetto - server\\userClients\\"+v.get(1)+"\\"+v.get(2);
+                            String directoryPath = "Progetto/server/userClients/prova/receivedEmails/"+v.get(1)+"/"+v.get(2);
                             Runnable updateTask = new UpdateTask(directoryPath, out, outObjectStream);
                             updateThreads.execute(updateTask);
                             break;
