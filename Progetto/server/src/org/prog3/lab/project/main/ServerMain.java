@@ -47,12 +47,12 @@ public class ServerMain {
 
                     switch (operation) {
                         case "login":
-                            String filePath = "src/org/prog3/lab/project/resources/userEmails";
+                            String filePath = "./server/src/org/prog3/lab/project/resources/userEmails";
                             Runnable loginTask = new LoginTask(v.get(1), v.get(2), filePath, out);
                             loginThreads.execute(loginTask);
                             break;
                         case "update":
-                            String directoryPath = "Progetto/server/userClients/prova/receivedEmails/"+v.get(1)+"/"+v.get(2);
+                            String directoryPath = "./server/src/org/prog3/lab/project/resources/receivedEmails/"+v.get(1)+"/"+v.get(2);
                             Runnable updateTask = new UpdateTask(directoryPath, out, outObjectStream);
                             updateThreads.execute(updateTask);
                             break;
