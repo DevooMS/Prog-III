@@ -2,6 +2,11 @@ package org.prog3.lab.project.threadModel;
 //new version 1.0
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class UpdateTask implements Runnable{
     private final String directoryPath;
@@ -17,15 +22,16 @@ public class UpdateTask implements Runnable{
     public void run(){
 
         try {
-            File dir = new File(directoryPath);
-            //System.out.println(directoryPath);
-            int countFiles = dir.listFiles().length;
+            File dir = new File (directoryPath);
+            int countFiles = dir.listFiles ().length;
 
+            //System.out.println(directoryPath);
+            //int countFiles = listFiles.length;
             outObjectStream.writeObject(countFiles);
 
             for(int i=0; i<countFiles; i++) {
 
-                BufferedReader reader = new BufferedReader(new FileReader(directoryPath + "\\e" + i));
+                BufferedReader reader = new BufferedReader(new FileReader(directoryPath + "/e" + i));
 
                 String line = reader.readLine();
 

@@ -47,7 +47,7 @@ public class EmailClient {
 
     public void updatelistReceivedEmails(){
         try {
-            Socket s = new Socket(InetAddress.getLocalHost().getHostName(), 8189);
+            Socket s = new Socket(InetAddress.getLocalHost().getHostName(), 8190);
 
             try {
                 //InputStream inStream = s.getInputStream();
@@ -99,7 +99,7 @@ public class EmailClient {
 
     public void updatelistSendedEmails(){
         try {
-            Socket s = new Socket(InetAddress.getLocalHost().getHostName(), 8189);
+            Socket s = new Socket(InetAddress.getLocalHost().getHostName(), 8190);
 
             try {
                 //InputStream inStream = s.getInputStream();
