@@ -1,8 +1,7 @@
 package org.prog3.lab.project.threadModel;
+//new version 1.0
 
 import java.io.*;
-import java.net.Socket;
-import java.util.Vector;
 
 public class UpdateTask implements Runnable{
     private final String directoryPath;
