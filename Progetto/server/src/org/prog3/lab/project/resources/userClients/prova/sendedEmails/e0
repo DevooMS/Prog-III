@@ -1,3 +1,4 @@
+--NO_READ--
 --START--
 prova from s
 --END--
@@ -8,10 +9,7 @@ prova to s
 prova object s
 --END--
 --START--
-01/01/2021
---END--
---START--
-00:00:00
+01/01/2021 00:00:00
 --END--
 --START_TEXT--
 prova text s

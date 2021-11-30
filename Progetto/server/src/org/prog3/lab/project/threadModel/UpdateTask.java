@@ -10,11 +10,13 @@ import java.util.stream.Collectors;
 
 public class UpdateTask implements Runnable{
     private final String directoryPath;
+    private final boolean startUpdate;
     private final PrintWriter outSimpleStream;
     private final ObjectOutputStream outObjectStream;
 
-    public UpdateTask(String directoryPath, PrintWriter outSimpleStream, ObjectOutputStream outObjectStream){
+    public UpdateTask(String directoryPath, boolean startUpdate, PrintWriter outSimpleStream, ObjectOutputStream outObjectStream){
         this.directoryPath = directoryPath;
+        this.startUpdate = startUpdate;
         this.outSimpleStream = outSimpleStream;
         this.outObjectStream = outObjectStream;
     }
@@ -39,39 +41,47 @@ public class UpdateTask implements Runnable{
 
                 int j=0;
 
-                while(line!=null) {
-
-                    if(line.equals("--START--")){
-
-                        line = reader.readLine();
-
-                        while(!line.equals("--END--")){
-                            lineToSend += line;
-
-                            line = reader.readLine();
-                        }
-                    } else if(line.equals("--START_TEXT--")){
-
-                        line = reader.readLine();
-
-                        while(!line.equals("--END_TEXT--")) {
-                            if (line.equals(""))
-                                lineToSend += "\n\n";
-                            else
-                                lineToSend += line + "\n";
-
-                            line = reader.readLine();
-                        }
-                    }
-
-                    outObjectStream.writeObject(lineToSend);
-
-                    lineToSend = "";
+                if((line.equals("--READ--") && startUpdate) || line.equals("--NO_READ--")) {
 
                     line = reader.readLine();
 
+                    while (line != null) {
+
+                        if (line.equals("--START--")) {
+
+                            line = reader.readLine();
+
+                            while (!line.equals("--END--")) {
+                                lineToSend += line;
+
+                                line = reader.readLine();
+                            }
+                        } else if (line.equals("--START_TEXT--")) {
+
+                            line = reader.readLine();
+
+                            while (!line.equals("--END_TEXT--")) {
+                                if (line.equals(""))
+                                    lineToSend += "\n\n";
+                                else
+                                    lineToSend += line + "\n";
+
+                                line = reader.readLine();
+                            }
+                        }
+
+                        outObjectStream.writeObject(lineToSend);
+
+                        lineToSend = "";
+
+                        line = reader.readLine();
+
+                    }
+
                 }
+
                 outObjectStream.writeObject("--END_EMAIL--");
+
             }
         }catch (IOException e) {
             e.printStackTrace();

@@ -6,6 +6,8 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.Tab;
+import org.prog3.lab.project.main.EmailClientMain;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -45,7 +47,19 @@ public class EmailClient {
         listSendedEmails.remove(email);
     }
 
-    public void updatelistReceivedEmails(){
+    public void updateEmailslists(boolean updateSended, boolean startUpdate){
+
+        serverRequestUpdateList(listReceivedEmails, "receivedEmails", startUpdate);
+
+        if(updateSended)
+            serverRequestUpdateList(listSendedEmails, "sendedEmails", startUpdate);
+
+    }
+
+    private void serverRequestUpdateList(List list, String mailsType, boolean startUpdate){
+
+        int countEmails = 0;
+
         try {
             Socket s = new Socket(InetAddress.getLocalHost().getHostName(), 8190);
 
@@ -60,11 +74,12 @@ public class EmailClient {
                 Vector<String> operationRequest = new Vector<>();
                 operationRequest.add("update");
                 operationRequest.add(emailAddressProperty().get());
-                operationRequest.add("receivedEmails");
+                operationRequest.add(mailsType);
+                operationRequest.add(String.valueOf(startUpdate));
 
                 outStream.writeObject(operationRequest);
 
-                int countEmails = (Integer) inStream.readObject();
+                countEmails = (Integer) inStream.readObject();
 
                 Vector<String> emailDetail = new Vector<>();
 
@@ -73,19 +88,23 @@ public class EmailClient {
                     int j = 0;
 
                     String email = (String) inStream.readObject();
+                    //emailDetail.add(j, email);
                     //System.out.println(email);
 
 
-                    do {
+                    while (!email.equals("--END_EMAIL--")) {
                         emailDetail.add(j, email);
                         //System.out.println(email);
                         email = (String) inStream.readObject();
                         j++;
 
-                    } while (!email.equals("--END_EMAIL--"));
+                    }
 
-                    Email e = new Email("1", emailDetail.get(0), Collections.singletonList(emailDetail.get(1)), emailDetail.get(2), emailDetail.get(3), emailDetail.get(4), emailDetail.get(5));
-                    listReceivedEmails.add(e);
+                    if(emailDetail.size() > 0) {
+                        //System.out.println(emailDetail.get(0)+" "+Collections.singletonList(emailDetail.get(1))+" "+emailDetail.get(2)+" "+emailDetail.get(3)+" "+emailDetail.get(4));
+                        Email e = new Email("1", emailDetail.get(0), Collections.singletonList(emailDetail.get(1)), emailDetail.get(2), EmailClientMain.getDate(), emailDetail.get(4));
+                        list.add(e);
+                    }
 
                 }
 
@@ -95,57 +114,7 @@ public class EmailClient {
         } catch (IOException | ClassNotFoundException e){
             e.printStackTrace();
         }
+
     }
 
-    public void updatelistSendedEmails(){
-        try {
-            Socket s = new Socket(InetAddress.getLocalHost().getHostName(), 8190);
-
-            try {
-                //InputStream inStream = s.getInputStream();
-                //Scanner in = new Scanner(inStream);
-
-                ObjectOutputStream outStream = new ObjectOutputStream(s.getOutputStream());
-
-                ObjectInputStream inStream = new ObjectInputStream(s.getInputStream());
-
-                Vector<String> operationRequest = new Vector<>();
-                operationRequest.add("update");
-                operationRequest.add(emailAddressProperty().get());
-                operationRequest.add("sendedEmails");
-
-                outStream.writeObject(operationRequest);
-
-                int countEmails = (Integer) inStream.readObject();
-
-                Vector<String> emailDetail = new Vector<>();
-
-                for(int i=0; i<countEmails; i++) {
-
-                    int j = 0;
-
-                    String email = (String) inStream.readObject();
-                    //System.out.println(email);
-
-
-                    do {
-                        emailDetail.add(j, email);
-                        //System.out.println(email);
-                        email = (String) inStream.readObject();
-                        j++;
-
-                    } while (!email.equals("--END_EMAIL--"));
-
-                    Email e = new Email("1", emailDetail.get(0), Collections.singletonList(emailDetail.get(1)), emailDetail.get(2), emailDetail.get(3), emailDetail.get(4), emailDetail.get(5));
-                    listSendedEmails.add(e);
-
-                }
-
-            }finally{
-                s.close();
-            }
-        } catch (IOException | ClassNotFoundException e){
-            e.printStackTrace();
-        }
-    }
 }

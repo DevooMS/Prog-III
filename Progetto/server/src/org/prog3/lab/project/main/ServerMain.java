@@ -53,8 +53,10 @@ public class ServerMain {
                             break;
                         case "update":
                             //System.out.println(v.get(1)+" "+v.get(2));
+                            //System.out.println("ok");
                             String directoryPath = "./server/src/org/prog3/lab/project/resources/userClients/"+v.get(1)+"/"+v.get(2);
-                            Runnable updateTask = new UpdateTask(directoryPath, out, outObjectStream);
+                            Runnable updateTask = new UpdateTask(directoryPath, Boolean.parseBoolean(v.get(3)), out, outObjectStream);
+                            //System.out.println(v.get(3));
                             updateThreads.execute(updateTask);
                             break;
                         default:

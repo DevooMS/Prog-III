@@ -9,22 +9,7 @@ import java.util.Vector;
 public class Login {
 
     public String searchUser(String userEmail, String userPassword) throws IOException {
-        /*try {
-            if (!userEmail.equals("") && !userPassword.equals("")) {
-                BufferedReader reader = new BufferedReader(new FileReader(filePath));
 
-                String line = reader.readLine();
-
-                while (line != null) {
-                    if (line.compareTo(userEmail + "-" + userPassword) == 0)
-                        return true;
-                    line = reader.readLine();
-                }
-            }
-        }catch (IOException e){
-            System.out.println(e.getMessage());
-        }
-        return false;*/
         try {
             if (!userEmail.equals("") && !userPassword.equals("")) {
                 Socket s = new Socket(InetAddress.getLocalHost().getHostName(), 8190);

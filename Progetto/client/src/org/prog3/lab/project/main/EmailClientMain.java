@@ -9,6 +9,8 @@ import org.prog3.lab.project.ui.LoginController;
 
 public class EmailClientMain extends Application {
 
+    private static String data;
+
     @Override
     public void start(Stage stage) throws Exception {
 
@@ -25,9 +27,18 @@ public class EmailClientMain extends Application {
         stage.setResizable(false);
         stage.show();
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        data = formatter.format(LocalDateTime.now());
+        //Email a = new Email("1", "", Collections.singletonList(""), "", data.toString(),"");
+        //list.add(a);
+
     }
 
     public static void main(String[] args) {
         launch();
+    }
+
+    public static String getDate(){
+        return data.toString();
     }
 }

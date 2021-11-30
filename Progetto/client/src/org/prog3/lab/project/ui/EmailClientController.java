@@ -82,7 +82,7 @@ public class EmailClientController {
         this.stage = stage;
         //istanza nuovo client
         //model.generateRandomEmails(10);
-        model.updatelistReceivedEmails();
+        model.updateEmailslists(true, true);
         selectEmail = null;
 
         //binding tra lstEmails e inboxProperty
@@ -93,19 +93,17 @@ public class EmailClientController {
         btnDelete.setOnAction(this::btnDeleteClick);
         labelSettings.setOnMouseClicked(this::labelSettingsClick);
         labelLogout.setOnMouseClicked(this::labelLogoutClick);
-        tabReceivedEmails.setOnSelectionChanged(this::updateEmailsList);
-
+        tabReceivedEmails.setOnSelectionChanged(this::updateEmailsLists);
         labelAccountName.textProperty().bind(model.emailAddressProperty());
 
-        emptyEmail = new Email("", "", List.of(""), "", "", "", "");
+        emptyEmail = new Email("", "", List.of(""), "", "", "");
 
         viewEmailDetail(emptyEmail);
     }
 
-    private void updateEmailsList(Event event) {
+    private void updateEmailsLists(Event event) {
 
-        model.updatelistSendedEmails();
-        model.updatelistReceivedEmails();
+        model.updateEmailslists(false, false );
     }
 
     protected void showSelectReceivedEmail(MouseEvent mouseEvent) {
