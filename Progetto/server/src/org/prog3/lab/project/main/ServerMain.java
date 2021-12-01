@@ -1,7 +1,13 @@
 package org.prog3.lab.project.main;
 
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+import org.prog3.lab.project.model.Server;
 import org.prog3.lab.project.threadModel.LoginTask;
 import org.prog3.lab.project.threadModel.UpdateTask;
+import org.prog3.lab.project.ui.ServerController;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -10,12 +16,12 @@ import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class ServerMain {
+
+public class ServerMain extends Application {
 
     private static final int NUM_THREAD = 1;
 
-    public static void main(String[] args) {
-
+    public static void main(String[] args) throws IOException {
         try {
             ServerSocket s = new ServerSocket(8190);
 
@@ -70,6 +76,27 @@ public class ServerMain {
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
+        //launch();
+    }
+
+
+
+    @Override
+    public void start(Stage stage) throws Exception {
+        FXMLLoader loaderServerPanel = new FXMLLoader(getClass().getResource("../ui/panelAdmin.fxml"));
+        Scene scene = new Scene(loaderServerPanel.load());
+
+        ServerController loaderController = loaderServerPanel.getController();
+        Server model = new Server();
+        loaderController.initialize(model);
+        stage.setTitle("main page");
+        stage.setScene(scene);
+        stage.setMinWidth(741);
+        stage.setMinHeight(535);
+        stage.setResizable(false);
+        stage.show();
+
 
     }
+
 }
