@@ -4,6 +4,7 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
@@ -11,11 +12,14 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import org.prog3.lab.project.model.Email;
 import org.prog3.lab.project.model.EmailClient;
 
 import java.awt.*;
+import java.io.IOException;
 import java.util.List;
 
 public class EmailClientController {
@@ -31,6 +35,9 @@ public class EmailClientController {
 
     @FXML
     private Button btnNewEmail;
+
+    @FXML
+    private Button btnUpdate;
 
     @FXML
     private ListView listReceivedEmails;
@@ -86,15 +93,18 @@ public class EmailClientController {
         selectEmail = null;
 
         //binding tra lstEmails e inboxProperty
+        labelAccountName.textProperty().bind(model.emailAddressProperty());
         listReceivedEmails.itemsProperty().bind(model.receivedEmailsProperty());
         listReceivedEmails.setOnMouseClicked(this::showSelectReceivedEmail);
         listSendedEmails.itemsProperty().bind(model.sendedEmailsProperty());
         listSendedEmails.setOnMouseClicked(this::showSelectSendedEmail);
+        btnNewEmail.setOnAction(this::btnNewEmailClick);
         btnDelete.setOnAction(this::btnDeleteClick);
+        btnUpdate.setOnAction(this::updateEmailsLists);
         labelSettings.setOnMouseClicked(this::labelSettingsClick);
         labelLogout.setOnMouseClicked(this::labelLogoutClick);
         tabReceivedEmails.setOnSelectionChanged(this::updateEmailsLists);
-        labelAccountName.textProperty().bind(model.emailAddressProperty());
+
 
         emptyEmail = new Email("", "", List.of(""), "", "", "");
 
@@ -104,6 +114,7 @@ public class EmailClientController {
     private void updateEmailsLists(Event event) {
 
         model.updateEmailslists(false, false );
+
     }
 
     protected void showSelectReceivedEmail(MouseEvent mouseEvent) {
@@ -118,6 +129,25 @@ public class EmailClientController {
 
         selectEmail = email;
         viewEmailDetail(email);
+    }
+
+    private void btnNewEmailClick(ActionEvent actionEvent) {
+
+        try {
+
+            FXMLLoader loaderEmailClient = new FXMLLoader(getClass().getResource("../resources/emailWriter.fxml"));
+
+            Stage writeStage = new Stage();
+
+            Scene scene = new Scene(loaderEmailClient.load());
+            writeStage.setScene(scene);
+            writeStage.initModality(Modality.APPLICATION_MODAL);
+            writeStage.show();
+
+        }catch (Exception e){
+            System.out.println("Exception: "+ e.getMessage());
+        }
+
     }
 
     protected void btnDeleteClick(ActionEvent actionEvent){
@@ -145,7 +175,7 @@ public class EmailClientController {
             textFrom.setText(email.getSender());
             textReceivers.setText(String.join(", ", email.getReceivers()));
             textObject.setText(email.getObject());
-            fieldDateHour.setText(String.join(" - ", List.of(email.getDate(), email.getHour())));
+            fieldDateHour.setText(String.join(" - ", List.of(email.getDate())));
             textEmail.setText(email.getText());
         }
     }

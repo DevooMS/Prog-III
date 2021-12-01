@@ -1,4 +1,4 @@
---NO_READ--
+--READ--
 --START--
 prova from s
 --END--
@@ -15,5 +15,7 @@ prova object s
 prova text s
 prova 2 s
 
+
 prova3 s
+
 --END_TEXT--

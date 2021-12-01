@@ -10,16 +10,14 @@ public class Email {
     private final List<String> receivers;
     private final String object;
     private final String date;
-    private final String hour;
     private final String text;
 
-    public Email(String id, String sender, List<String> receivers, String object, String date, String hour, String text){
+    public Email(String id, String sender, List<String> receivers, String object, String date, String text){
         this.id = id;
         this.sender = sender;
         this.receivers = new ArrayList<>(receivers);
         this.object = object;
         this.date = date;
-        this.hour = hour;
         this.text = text;
     }
 
@@ -43,7 +41,6 @@ public class Email {
         return date;
     }
 
-    public String getHour() {return hour;}
 
     public String getText() {
         return text;

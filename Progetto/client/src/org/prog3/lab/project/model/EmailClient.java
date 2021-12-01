@@ -64,8 +64,6 @@ public class EmailClient {
             Socket s = new Socket(InetAddress.getLocalHost().getHostName(), 8190);
 
             try {
-                //InputStream inStream = s.getInputStream();
-                //Scanner in = new Scanner(inStream);
 
                 ObjectOutputStream outStream = new ObjectOutputStream(s.getOutputStream());
 
@@ -88,21 +86,17 @@ public class EmailClient {
                     int j = 0;
 
                     String email = (String) inStream.readObject();
-                    //emailDetail.add(j, email);
-                    //System.out.println(email);
-
 
                     while (!email.equals("--END_EMAIL--")) {
                         emailDetail.add(j, email);
+                        j++;
                         //System.out.println(email);
                         email = (String) inStream.readObject();
-                        j++;
-
                     }
 
                     if(emailDetail.size() > 0) {
-                        //System.out.println(emailDetail.get(0)+" "+Collections.singletonList(emailDetail.get(1))+" "+emailDetail.get(2)+" "+emailDetail.get(3)+" "+emailDetail.get(4));
-                        Email e = new Email("1", emailDetail.get(0), Collections.singletonList(emailDetail.get(1)), emailDetail.get(2), EmailClientMain.getDate(), emailDetail.get(4));
+                        //System.out.println(emailDetail.get(0)+" "+emailDetail.get(1)+" "+Collections.singletonList(emailDetail.get(2))+" "+emailDetail.get(3)+" "+emailDetail.get(4)+" "+emailDetail.get(5));
+                        Email e = new Email(emailDetail.get(0), emailDetail.get(1), Collections.singletonList(emailDetail.get(2)), emailDetail.get(3), emailDetail.get(4), emailDetail.get(5));
                         list.add(e);
                     }
 
