@@ -1,5 +1,7 @@
 package org.prog3.lab.project.model;
 
+import javafx.scene.control.Label;
+
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -8,7 +10,9 @@ import java.util.Vector;
 
 public class Login {
 
-    public String searchUser(String userEmail, String userPassword) throws IOException {
+    public String searchUser(String userEmail, String userPassword, Label labelResult) throws IOException {
+
+        String response = "error";
 
         try {
             if (!userEmail.equals("") && !userPassword.equals("")) {
@@ -27,7 +31,7 @@ public class Login {
 
                     outStream.writeObject(operationRequest);
 
-                    String response = in.nextLine();
+                    response = in.nextLine();
 
                     return response;
                 }finally{
@@ -38,6 +42,6 @@ public class Login {
             e.printStackTrace();
         }
 
-        return "denied";
+        return response;
     }
 }

@@ -54,13 +54,16 @@ public class LoginController {
     protected void btnLoginClick() throws Exception{
         labelResult.setStyle("-fx-text-fill:GREEN");
         labelResult.setText("Login incorso. Attendere...");
-        String access = model.searchUser(fieldEmail.getText(), fieldPassword.getText());
+        String access = model.searchUser(fieldEmail.getText(), fieldPassword.getText(), labelResult);
         //System.out.println(access);
         if (access.contains("accept")) {
             loadEmailClient();
-        } else {
+        } else if (access.contains("denied")) {
             labelResult.setStyle("-fx-text-fill:RED");
             labelResult.setText("Email o password errati. Riprovare!");
+        } else {
+            labelResult.setStyle("-fx-text-fill:RED");
+            labelResult.setText("Errore di connessione al server.");
         }
         //model.searchUser(fieldEmail.getText(), fieldPassword.getText());
     }

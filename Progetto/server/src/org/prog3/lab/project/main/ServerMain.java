@@ -1,13 +1,9 @@
 package org.prog3.lab.project.main;
 
-import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
-import org.prog3.lab.project.model.Server;
+
 import org.prog3.lab.project.threadModel.LoginTask;
+import org.prog3.lab.project.threadModel.ServerThread;
 import org.prog3.lab.project.threadModel.UpdateTask;
-import org.prog3.lab.project.ui.ServerController;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -16,14 +12,19 @@ import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+public class ServerMain {
 
-public class ServerMain extends Application {
+    private static final int NUM_THREAD = 5;
 
-    private static final int NUM_THREAD = 1;
+    public static void main(String[] args) throws Exception {
 
-    public static void main(String[] args) throws IOException {
+        ServerSocket s = new ServerSocket(8190);
+
+        ServerThread st = new ServerThread();
+        Thread t = new Thread(st);
+        t.start();
+
         try {
-            ServerSocket s = new ServerSocket(8190);
 
             ExecutorService loginThreads = Executors.newFixedThreadPool(NUM_THREAD);
             ExecutorService updateThreads = Executors.newFixedThreadPool(NUM_THREAD);
@@ -65,6 +66,9 @@ public class ServerMain extends Application {
                             //System.out.println(v.get(3));
                             updateThreads.execute(updateTask);
                             break;
+                        case "terminate":
+                                //System.out.println("ok");
+                                System.exit(0);
                         default:
                             new IOException();
                             break;
@@ -76,27 +80,6 @@ public class ServerMain extends Application {
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
-        //launch();
-    }
-
-
-
-    @Override
-    public void start(Stage stage) throws Exception {
-        FXMLLoader loaderServerPanel = new FXMLLoader(getClass().getResource("../ui/panelAdmin.fxml"));
-        Scene scene = new Scene(loaderServerPanel.load());
-
-        ServerController loaderController = loaderServerPanel.getController();
-        Server model = new Server();
-        loaderController.initialize(model);
-        stage.setTitle("main page");
-        stage.setScene(scene);
-        stage.setMinWidth(741);
-        stage.setMinHeight(535);
-        stage.setResizable(false);
-        stage.show();
-
-
     }
 
 }

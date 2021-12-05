@@ -11,7 +11,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -28,12 +30,6 @@ public class EmailClientController {
     private Label labelAccountName;
 
     @FXML
-    private Label labelSettings;
-
-    @FXML
-    private Label labelLogout;
-
-    @FXML
     private Button btnNewEmail;
 
     @FXML
@@ -44,6 +40,12 @@ public class EmailClientController {
 
     @FXML
     private ListView listSendedEmails;
+
+    @FXML
+    private StackPane paneDetails;
+
+    @FXML
+    private StackPane paneNoSelect;
 
     @FXML
     private TextArea textReceivers;
@@ -79,11 +81,14 @@ public class EmailClientController {
     private Stage stage;
     private Email selectEmail;
     private Email emptyEmail;
+    private boolean activate = false;
 
     @FXML
     public void initialize(EmailClient model, Stage stage){
         if (this.model != null)
             throw new IllegalStateException("Model can only be initialized once");
+
+
 
         this.model =model;
         this.stage = stage;
@@ -101,8 +106,6 @@ public class EmailClientController {
         btnNewEmail.setOnAction(this::btnNewEmailClick);
         btnDelete.setOnAction(this::btnDeleteClick);
         btnUpdate.setOnAction(this::updateEmailsLists);
-        labelSettings.setOnMouseClicked(this::labelSettingsClick);
-        labelLogout.setOnMouseClicked(this::labelLogoutClick);
         tabReceivedEmails.setOnSelectionChanged(this::updateEmailsLists);
 
 
@@ -118,6 +121,10 @@ public class EmailClientController {
     }
 
     protected void showSelectReceivedEmail(MouseEvent mouseEvent) {
+
+        if(!activate)
+            activeFiled();
+
         Email email = (Email) listReceivedEmails.getSelectionModel().getSelectedItem();
 
         selectEmail = email;
@@ -125,25 +132,36 @@ public class EmailClientController {
     }
 
     protected void showSelectSendedEmail(MouseEvent mouseEvent) {
+
+        if(!activate)
+            activeFiled();
+
         Email email = (Email) listSendedEmails.getSelectionModel().getSelectedItem();
 
         selectEmail = email;
         viewEmailDetail(email);
     }
 
+    protected void activeFiled(){
+        paneDetails.setVisible(true);
+        paneNoSelect.setVisible(false);
+        activate=true;
+    }
+
     private void btnNewEmailClick(ActionEvent actionEvent) {
 
         try {
-
-            FXMLLoader loaderEmailClient = new FXMLLoader(getClass().getResource("../resources/emailWriter.fxml"));
-
+            FXMLLoader loaderEmailWriter = new FXMLLoader(getClass().getResource("../resources/emailWriter.fxml"));
+            Scene scene = new Scene(loaderEmailWriter.load());
+            EmailWriterController emailWriterController = loaderEmailWriter.getController();
+            emailWriterController.initialize();
             Stage writeStage = new Stage();
-
-            Scene scene = new Scene(loaderEmailClient.load());
-            writeStage.setScene(scene);
             writeStage.initModality(Modality.APPLICATION_MODAL);
+            writeStage.setScene(scene);
+            writeStage.setMinWidth(650);
+            writeStage.setMinHeight(500);
+            writeStage.setResizable(false);
             writeStage.show();
-
         }catch (Exception e){
             System.out.println("Exception: "+ e.getMessage());
         }
@@ -153,21 +171,6 @@ public class EmailClientController {
     protected void btnDeleteClick(ActionEvent actionEvent){
         model.deleteEmail(selectEmail);
         viewEmailDetail(emptyEmail);
-    }
-
-    protected void labelSettingsClick(MouseEvent mouseEvent){
-        FXMLLoader loaderEmailClient = new FXMLLoader(getClass().getResource("../resources/login.fxml"));
-
-        try {
-            Scene scene = new Scene(loaderEmailClient.load());
-            stage.setScene(scene);
-        }catch (Exception e){
-            System.out.println("Exception: "+ e.getMessage());
-        }
-    }
-
-    protected void labelLogoutClick(MouseEvent mouseEvent){
-        stage.close();
     }
 
     protected void viewEmailDetail(Email email) {

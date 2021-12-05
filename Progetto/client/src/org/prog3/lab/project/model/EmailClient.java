@@ -105,6 +105,7 @@ public class EmailClient {
             }finally{
                 s.close();
             }
+
         } catch (IOException | ClassNotFoundException e){
             e.printStackTrace();
         }
