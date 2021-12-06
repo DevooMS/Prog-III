@@ -58,7 +58,7 @@ public class EmailWriterController {
     }
 
     private void keyReleased(KeyEvent keyEvent) {
-        if(Pattern.matches("([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}\s*)+", textReceivers.getText())) {
+        if(Pattern.matches("^([A-Za-z0-9\\.|-|_]*[@]{1}[A-Za-z0-9\\.|-|_]*[.]{1}[a-z]{2,5})(,[A-Za-z0-9\\.|-|_]*[@]{1}[A-Za-z0-9\\.|-|_]*[.]{1}[a-z]{2,5})*?$", textReceivers.getText())) {
             textReceivers.setStyle("-fx-border-color: green");
 
             if(labelError.isVisible())

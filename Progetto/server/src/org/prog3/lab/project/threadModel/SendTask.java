@@ -3,6 +3,8 @@ package org.prog3.lab.project.threadModel;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Vector;
 
 public class SendTask implements Runnable{
 
@@ -13,6 +15,7 @@ public class SendTask implements Runnable{
     String text;
     private final ObjectOutputStream outStream;
     private String wrongAddress = "";
+    private ArrayList<String> listReceivers = new ArrayList<>();
 
     public SendTask(String path, String from,  String receivers, String object, String text, ObjectOutputStream outStream) {
         this.path = path;
@@ -57,6 +60,8 @@ public class SendTask implements Runnable{
                     writeFile(data, false, out);
                     writeFile(text, true, out);
 
+                    //for(int i=0; i<)
+
                     response = "Email inviata correttamente.";
 
                 } else{
@@ -86,7 +91,7 @@ public class SendTask implements Runnable{
 
         while(end>=0){
 
-            end = receivers.indexOf(" ", start);
+            end = receivers.indexOf(",", start);
 
             String receiver;
 
@@ -94,6 +99,8 @@ public class SendTask implements Runnable{
                 receiver = receivers.substring(start, end);
             else
                 receiver = receivers.substring(start, receivers.length());
+
+            listReceivers.add(receiver);
 
             File folder = new File(path+receiver);
 
@@ -103,11 +110,10 @@ public class SendTask implements Runnable{
             start = end+1;
         }
 
-        System.out.println(wrongAddress);
-
-        if(wrongAddress.length() > 0)
+        if(wrongAddress.length() > 0) {
+            listReceivers = null;
             return false;
-        else
+        }else
             return true;
     }
 

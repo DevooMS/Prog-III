@@ -13,7 +13,11 @@ import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class ServerMain {
+public class ServerMain extends Thread{
+
+    public ServerMain(){
+        setDaemon(true);
+    }
 
     private static final int NUM_THREAD = 5;
 
@@ -77,7 +81,8 @@ public class ServerMain {
                             break;
                         case "terminate":
                             //System.out.println("ok");
-                            System.exit(0);
+                            //System.exit(0);
+                            s.close();
                         default:
                             new IOException();
                             break;
