@@ -6,14 +6,12 @@ import java.io.*;
 public class UpdateTask implements Runnable{
     private final String directoryPath;
     private final boolean startUpdate;
-    private final PrintWriter outSimpleStream;
-    private final ObjectOutputStream outObjectStream;
+    private final ObjectOutputStream outStream;
 
-    public UpdateTask(String directoryPath, boolean startUpdate, PrintWriter outSimpleStream, ObjectOutputStream outObjectStream){
+    public UpdateTask(String directoryPath, boolean startUpdate, ObjectOutputStream outStream){
         this.directoryPath = directoryPath;
         this.startUpdate = startUpdate;
-        this.outSimpleStream = outSimpleStream;
-        this.outObjectStream = outObjectStream;
+        this.outStream = outStream;
     }
 
     public void run(){
@@ -23,7 +21,7 @@ public class UpdateTask implements Runnable{
             File[] listOfFiles = dir.listFiles();
             int countFiles = listOfFiles.length;
 
-            outObjectStream.writeObject(countFiles);
+            outStream.writeObject(countFiles);
 
             for(int i=0; i<countFiles; i++) {
 
@@ -39,7 +37,7 @@ public class UpdateTask implements Runnable{
 
                 if((line.equals("--READ--") && startUpdate) || line.equals("--NO_READ--")) {
 
-                    outObjectStream.writeObject(listOfFiles[i].getName());
+                    outStream.writeObject(listOfFiles[i].getName());
 
                     if(line.equals("--NO_READ--")){
                         rewrite = true;
@@ -87,7 +85,7 @@ public class UpdateTask implements Runnable{
 
                         }
 
-                        outObjectStream.writeObject(lineToSend);
+                        outStream.writeObject(lineToSend);
 
                         lineToSend = "";
 
@@ -106,7 +104,7 @@ public class UpdateTask implements Runnable{
                     out.close();
                 }
 
-                outObjectStream.writeObject("--END_EMAIL--");
+                outStream.writeObject("--END_EMAIL--");
 
             }
         }catch (IOException e) {

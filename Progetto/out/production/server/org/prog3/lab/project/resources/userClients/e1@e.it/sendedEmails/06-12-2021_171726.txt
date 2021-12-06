@@ -1,33 +1,22 @@
 --READ--
 --START--
-prova from
+e1@e.it
 --END--
 --START--
-prova to
+e2@e.it e2@e.it
 --END--
 --START--
-fanculo
+prova
 --END--
 --START--
-01/01/2021 00:00:00
+06/12/2021 17:17:26
 --END--
 --START_TEXT--
-prova text
-prova 2
+prova
 
 
 
 
-
-
-
-
-prova3
-
-
-
-
-
-
+prova
 
 --END_TEXT--

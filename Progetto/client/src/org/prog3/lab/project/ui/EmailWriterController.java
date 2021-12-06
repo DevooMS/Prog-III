@@ -1,11 +1,13 @@
 package org.prog3.lab.project.ui;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.StringProperty;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.InputMethodEvent;
 import javafx.scene.input.KeyEvent;
+import org.prog3.lab.project.model.EmailWriter;
 
 import java.util.regex.Pattern;
 
@@ -16,12 +18,43 @@ public class EmailWriterController {
     private TextArea textReceivers;
 
     @FXML
+    private TextArea textObject;
+
+    @FXML
+    private TextArea textEmail;
+
+    @FXML
     private Label labelError;
 
     @FXML
-    public void initialize(){
+    private Button btnSend;
+
+    private EmailWriter model;
+    private StringProperty emailAddress;
+
+    @FXML
+    public void initialize(EmailWriter model, StringProperty emailAddress){
+        if (this.model != null)
+            throw new IllegalStateException("Model can only be initialized once");
+
+        this.model = model;
+        this.emailAddress = emailAddress;
+
         textReceivers.setOnKeyReleased(this::keyReleased);
         labelError.setStyle("-fx-text-fill: red");
+
+        btnSend.setDisable(true);
+        btnSend.setOnAction(this::btnSendClick);
+    }
+
+    private void btnSendClick(ActionEvent actionEvent) {
+        String response = model.serverSendEmail(emailAddress, textReceivers.getText(), textObject.getText(), textEmail.getText());
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setHeaderText(null);
+        alert.setTitle("Informazioni invio");
+        alert.setContentText(response);
+        alert.showAndWait();
     }
 
     private void keyReleased(KeyEvent keyEvent) {
@@ -31,13 +64,18 @@ public class EmailWriterController {
             if(labelError.isVisible())
                 labelError.setVisible(false);
 
+            if(btnSend.isDisable())
+                btnSend.setDisable(false);
+
         }else {
             textReceivers.setStyle("-fx-border-color: red");
 
             if(!labelError.isVisible())
                 labelError.setVisible(true);
+
+            if(!btnSend.isDisable())
+                btnSend.setDisable(true);
         }
     }
-
 
 }

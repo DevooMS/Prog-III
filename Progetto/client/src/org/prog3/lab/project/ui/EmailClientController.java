@@ -19,6 +19,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.prog3.lab.project.model.Email;
 import org.prog3.lab.project.model.EmailClient;
+import org.prog3.lab.project.model.EmailWriter;
 
 import java.awt.*;
 import java.io.IOException;
@@ -154,7 +155,8 @@ public class EmailClientController {
             FXMLLoader loaderEmailWriter = new FXMLLoader(getClass().getResource("../resources/emailWriter.fxml"));
             Scene scene = new Scene(loaderEmailWriter.load());
             EmailWriterController emailWriterController = loaderEmailWriter.getController();
-            emailWriterController.initialize();
+            EmailWriter model = new EmailWriter();
+            emailWriterController.initialize(model, this.model.emailAddressProperty());
             Stage writeStage = new Stage();
             writeStage.initModality(Modality.APPLICATION_MODAL);
             writeStage.setScene(scene);

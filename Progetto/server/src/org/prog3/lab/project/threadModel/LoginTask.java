@@ -7,13 +7,13 @@ public class LoginTask implements Runnable{
     private final String email;
     private final String password;
     private final String filePath;
-    private final PrintWriter out;
+    private final ObjectOutputStream outStream;
 
-    public LoginTask(String email, String password, String filePath, PrintWriter out){
+    public LoginTask(String email, String password, String filePath, ObjectOutputStream outStream){
         this.email = email;
         this.password = password;
         this.filePath = filePath;
-        this.out = out;
+        this.outStream = outStream;
     }
 
     public void run(){
@@ -32,7 +32,7 @@ public class LoginTask implements Runnable{
             }
 
             //System.out.println(response);
-            out.println(response);
+            outStream.writeObject(response);
 
         }catch (IOException e){
             System.out.println(e.getMessage());

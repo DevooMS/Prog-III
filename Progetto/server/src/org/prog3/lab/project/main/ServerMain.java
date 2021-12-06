@@ -2,6 +2,7 @@ package org.prog3.lab.project.main;
 
 
 import org.prog3.lab.project.threadModel.LoginTask;
+import org.prog3.lab.project.threadModel.SendTask;
 import org.prog3.lab.project.threadModel.ServerThread;
 import org.prog3.lab.project.threadModel.UpdateTask;
 
@@ -28,16 +29,17 @@ public class ServerMain {
 
             ExecutorService loginThreads = Executors.newFixedThreadPool(NUM_THREAD);
             ExecutorService updateThreads = Executors.newFixedThreadPool(NUM_THREAD);
+            ExecutorService sendThreads = Executors.newFixedThreadPool(NUM_THREAD);
 
             try{
                 while(true) {
                     Socket incoming = s.accept();
 
-                    ObjectOutputStream outObjectStream = new ObjectOutputStream(incoming.getOutputStream());
+                    ObjectOutputStream outStream = new ObjectOutputStream(incoming.getOutputStream());
                     ObjectInputStream inStream = new ObjectInputStream(incoming.getInputStream());
 
-                    OutputStream outSimpleStream = incoming.getOutputStream();
-                    PrintWriter out = new PrintWriter(outSimpleStream, true);
+                    /*OutputStream outSimpleStream = incoming.getOutputStream();
+                    PrintWriter out = new PrintWriter(outSimpleStream, true);*/
 
                     Vector<String> v = null;
 
@@ -52,23 +54,30 @@ public class ServerMain {
                     if (v != null)
                         operation = v.get(0);
 
+                    String path;
+
                     switch (operation) {
                         case "login":
-                            String filePath = "./server/src/org/prog3/lab/project/resources/userEmails";
-                            Runnable loginTask = new LoginTask(v.get(1), v.get(2), filePath, out);
+                            path = "./server/src/org/prog3/lab/project/resources/userEmails.txt";
+                            Runnable loginTask = new LoginTask(v.get(1), v.get(2), path, outStream);
                             loginThreads.execute(loginTask);
                             break;
                         case "update":
                             //System.out.println(v.get(1)+" "+v.get(2));
                             //System.out.println("ok");
-                            String directoryPath = "./server/src/org/prog3/lab/project/resources/userClients/"+v.get(1)+"/"+v.get(2);
-                            Runnable updateTask = new UpdateTask(directoryPath, Boolean.parseBoolean(v.get(3)), out, outObjectStream);
+                            path = "./server/src/org/prog3/lab/project/resources/userClients/"+v.get(1)+"/"+v.get(2);
+                            Runnable updateTask = new UpdateTask(path, Boolean.parseBoolean(v.get(3)), outStream);
                             //System.out.println(v.get(3));
                             updateThreads.execute(updateTask);
                             break;
+                        case "send":
+                            path = "./server/src/org/prog3/lab/project/resources/userClients/"+v.get(1)+"/sendedEmails/";
+                            Runnable sendTask = new SendTask(path, v.get(1), v.get(2), v.get(3), v.get(4), outStream);
+                            sendThreads.execute(sendTask);
+                            break;
                         case "terminate":
-                                //System.out.println("ok");
-                                System.exit(0);
+                            //System.out.println("ok");
+                            System.exit(0);
                         default:
                             new IOException();
                             break;

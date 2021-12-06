@@ -1,22 +1,26 @@
 package org.prog3.lab.project.ui;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import org.prog3.lab.project.model.EmailClient;
 import org.prog3.lab.project.model.Login;
 
+import java.io.IOException;
+
 public class LoginController {
     @FXML
     private TextField fieldEmail;
 
     @FXML
-    private TextField fieldPassword;
+    private PasswordField fieldPassword;
 
     @FXML
     private Label labelResult;
@@ -37,13 +41,29 @@ public class LoginController {
 
         fieldEmail.setOnMouseClicked(this::userDataClick);
         fieldPassword.setOnMouseClicked(this::userDataClick);
-        btnLogin.setOnAction(ActionEvent -> {
-            try {
-                btnLoginClick();
-            } catch (Exception e) {
-                e.printStackTrace();
+        btnLogin.setOnAction(this::btnLoginClick);
+    }
+
+    private void btnLoginClick(ActionEvent actionEvent) {
+
+        try {
+            labelResult.setStyle("-fx-text-fill:GREEN");
+            labelResult.setText("Login incorso. Attendere...");
+            String access = model.searchUser(fieldEmail.getText(), fieldPassword.getText(), labelResult);
+            //System.out.println(access);
+            if (access.equals("accept")) {
+                loadEmailClient();
+            } else if (access.equals("denied")) {
+                labelResult.setStyle("-fx-text-fill:RED");
+                labelResult.setText("Email o password errati. Riprovare!");
+            } else {
+                labelResult.setStyle("-fx-text-fill:RED");
+                labelResult.setText("Errore di connessione al server.");
             }
-        });
+        } catch (Exception e){
+            System.out.println("Exception: "+ e.getMessage());
+        }
+
     }
 
     protected void userDataClick(MouseEvent mouseEvent) {
@@ -51,22 +71,6 @@ public class LoginController {
     }
 
 
-    protected void btnLoginClick() throws Exception{
-        labelResult.setStyle("-fx-text-fill:GREEN");
-        labelResult.setText("Login incorso. Attendere...");
-        String access = model.searchUser(fieldEmail.getText(), fieldPassword.getText(), labelResult);
-        //System.out.println(access);
-        if (access.contains("accept")) {
-            loadEmailClient();
-        } else if (access.contains("denied")) {
-            labelResult.setStyle("-fx-text-fill:RED");
-            labelResult.setText("Email o password errati. Riprovare!");
-        } else {
-            labelResult.setStyle("-fx-text-fill:RED");
-            labelResult.setText("Errore di connessione al server.");
-        }
-        //model.searchUser(fieldEmail.getText(), fieldPassword.getText());
-    }
 
     public void loadEmailClient() throws Exception{
         try{

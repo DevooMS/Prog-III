@@ -33,8 +33,6 @@ public class EmailClient {
         this.emailAddress = new SimpleStringProperty(emailAddress);
     }
 
-    //public ListProperty<Email> emailsListProperty(){ return emailsProperty;}
-
     public ListProperty<Email> receivedEmailsProperty(){ return receivedEmailsProperty;}
 
     public ListProperty<Email> sendedEmailsProperty(){ return sendedEmailsProperty;}
