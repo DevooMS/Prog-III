@@ -86,7 +86,7 @@ public class ServerMain {
                             //System.out.println("ok");
                             //System.exit(0);
                             accept=false;
-                            s.close();
+                            //s.close();
                             loginThreads.shutdown();
                             loginThreads.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
                             updateThreads.shutdown();
