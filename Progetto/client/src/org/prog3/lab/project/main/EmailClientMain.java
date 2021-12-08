@@ -21,7 +21,7 @@ public class EmailClientMain extends Application {
         Scene scene = new Scene(loaderLogin.load());
 
         LoginController loginController = loaderLogin.getController();
-        Login model = new Login();
+        Login model = new Login();                                             //model una nuova instanza del model package login
         loginController.initialize(model, stage);
         stage.setTitle("User Login");
         stage.setScene(scene);

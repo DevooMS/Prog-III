@@ -17,7 +17,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class EmailClient {
-    private final ObservableList<Email> listReceivedEmails;
+    private final ObservableList<Email> listReceivedEmails;    //gli salvo dentro la lista di email da email.java
     private final ObservableList<Email> listSendedEmails;
     private final ListProperty<Email> sendedEmailsProperty;
     private final ListProperty<Email> receivedEmailsProperty;
@@ -27,7 +27,7 @@ public class EmailClient {
         this.listReceivedEmails = FXCollections.observableArrayList();
         this.listSendedEmails = FXCollections.observableArrayList();
         this.receivedEmailsProperty = new SimpleListProperty<>();
-        this.receivedEmailsProperty.set(listReceivedEmails);
+        this.receivedEmailsProperty.set(listReceivedEmails);             //gli sto associando il suo observer cioe ListrecivedEmails
         this.sendedEmailsProperty = new SimpleListProperty<>();
         this.sendedEmailsProperty.set(listSendedEmails);
         this.emailAddress = new SimpleStringProperty(emailAddress);
@@ -94,7 +94,7 @@ public class EmailClient {
 
                     if(emailDetail.size() > 0) {
                         //System.out.println(emailDetail.get(0)+" "+emailDetail.get(1)+" "+Collections.singletonList(emailDetail.get(2))+" "+emailDetail.get(3)+" "+emailDetail.get(4)+" "+emailDetail.get(5));
-                        Email e = new Email(emailDetail.get(0), emailDetail.get(1), Collections.singletonList(emailDetail.get(2)), emailDetail.get(3), emailDetail.get(4), emailDetail.get(5));
+                        Email e = new Email(emailDetail.get(0), emailDetail.get(1), Collections.singletonList(emailDetail.get(2)), emailDetail.get(3), emailDetail.get(4), emailDetail.get(5));   //nuovo oggetto email 
                         list.add(e);
                     }
 

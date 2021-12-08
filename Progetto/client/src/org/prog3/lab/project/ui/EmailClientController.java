@@ -94,13 +94,13 @@ public class EmailClientController {
         this.stage = stage;
         //istanza nuovo client
         //model.generateRandomEmails(10);
-        model.updateEmailslists(true, true);
+        model.updateEmailslists(true, true);  //inizio partendo con update della lista inviate
         selectEmail = null;
 
         //binding tra lstEmails e inboxProperty
         labelAccountName.textProperty().bind(model.emailAddressProperty());
         listReceivedEmails.itemsProperty().bind(model.receivedEmailsProperty());
-        listReceivedEmails.setOnMouseClicked(this::showSelectReceivedEmail);
+        listReceivedEmails.setOnMouseClicked(this::showSelectReceivedEmail);    //this prende il metodo showselectRecivedEmail e gli passa mouse event
         listSendedEmails.itemsProperty().bind(model.sendedEmailsProperty());
         listSendedEmails.setOnMouseClicked(this::showSelectSendedEmail);
         btnNewEmail.setOnAction(this::btnNewEmailClick);
@@ -124,7 +124,7 @@ public class EmailClientController {
         if(!activate)
             activeFiled();
 
-        Email email = (Email) listReceivedEmails.getSelectionModel().getSelectedItem();
+        Email email = (Email) listReceivedEmails.getSelectionModel().getSelectedItem(); //casting ??
 
         selectEmail = email;
         viewEmailDetail(email);
@@ -175,7 +175,7 @@ public class EmailClientController {
 
     protected void viewEmailDetail(Email email) {
         if(email != null) {
-            textFrom.setText(email.getSender());
+            textFrom.setText(email.getSender());    //campi assegnati da scenebuilder fx::ID
             textReceivers.setText(String.join(", ", email.getReceivers()));
             textObject.setText(email.getObject());
             fieldDateHour.setText(String.join(" - ", List.of(email.getDate())));
