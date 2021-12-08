@@ -3,12 +3,17 @@ package org.prog3.lab.project.ui;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.InputMethodEvent;
 import javafx.scene.input.KeyEvent;
+import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
+import org.prog3.lab.project.model.EmailClient;
 import org.prog3.lab.project.model.EmailWriter;
 
+import java.io.IOException;
 import java.util.regex.Pattern;
 
 
@@ -29,15 +34,20 @@ public class EmailWriterController {
     @FXML
     private Button btnSend;
 
-    private EmailWriter model;
+
+    private EmailWriter modelWriter;
+    private EmailClient modelClient;
     private StringProperty emailAddress;
+    private Stage writeStage;
 
     @FXML
-    public void initialize(EmailWriter model, StringProperty emailAddress){
-        if (this.model != null)
+    public void initialize(EmailWriter modelWriter, EmailClient modelClient, Stage writeStage, StringProperty emailAddress){
+        if (this.modelWriter != null)
             throw new IllegalStateException("Model can only be initialized once");
 
-        this.model = model;
+        this.modelWriter = modelWriter;
+        this.modelClient = modelClient;
+        this.writeStage = writeStage;
         this.emailAddress = emailAddress;
 
         textReceivers.setOnKeyReleased(this::keyReleased);
@@ -48,13 +58,18 @@ public class EmailWriterController {
     }
 
     private void btnSendClick(ActionEvent actionEvent) {
-        String response = model.serverSendEmail(emailAddress, textReceivers.getText(), textObject.getText(), textEmail.getText());
+        String response = modelWriter.serverSendEmail(emailAddress, textReceivers.getText(), textObject.getText(), textEmail.getText());
 
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setHeaderText(null);
         alert.setTitle("Informazioni invio");
         alert.setContentText(response);
         alert.showAndWait();
+
+        if(response.equals("Email inviata correttamente.")) {
+            writeStage.close();
+            modelClient.updateEmailslists(true, false);
+        }
     }
 
     private void keyReleased(KeyEvent keyEvent) {

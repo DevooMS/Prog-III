@@ -1,6 +1,5 @@
 package org.prog3.lab.project.main;
 
-
 import org.prog3.lab.project.threadModel.LoginTask;
 import org.prog3.lab.project.threadModel.SendTask;
 import org.prog3.lab.project.threadModel.ServerThread;
@@ -13,24 +12,28 @@ import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class ServerMain extends Thread{
+public class ServerMain extends Thread {
+
+    private static final int NUM_THREAD = 5;
 
     public ServerMain(){
         setDaemon(true);
     }
 
-    private static final int NUM_THREAD = 5;
-
     public static void main(String[] args) throws Exception {
-
-        ServerSocket s = new ServerSocket(8190);
 
         ServerThread st = new ServerThread();
         Thread t = new Thread(st);
         t.start();
 
-        try {
+        ServerOperation ();
 
+    }
+
+    private static void ServerOperation(){
+
+        try {
+            ServerSocket s = new ServerSocket(8190);
             ExecutorService loginThreads = Executors.newFixedThreadPool(NUM_THREAD);
             ExecutorService updateThreads = Executors.newFixedThreadPool(NUM_THREAD);
             ExecutorService sendThreads = Executors.newFixedThreadPool(NUM_THREAD);
@@ -41,9 +44,6 @@ public class ServerMain extends Thread{
 
                     ObjectOutputStream outStream = new ObjectOutputStream(incoming.getOutputStream());
                     ObjectInputStream inStream = new ObjectInputStream(incoming.getInputStream());
-
-                    /*OutputStream outSimpleStream = incoming.getOutputStream();
-                    PrintWriter out = new PrintWriter(outSimpleStream, true);*/
 
                     Vector<String> v = null;
 
@@ -92,7 +92,7 @@ public class ServerMain extends Thread{
                 s.close();
             }
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 

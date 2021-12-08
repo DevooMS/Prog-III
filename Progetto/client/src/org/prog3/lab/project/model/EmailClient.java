@@ -100,6 +100,8 @@ public class EmailClient {
 
                 }
 
+                //Collections.sort(list, Comparator.comparing((Email email) -> email.getDate()));
+                Collections.reverse(list);
             }finally{
                 s.close();
             }

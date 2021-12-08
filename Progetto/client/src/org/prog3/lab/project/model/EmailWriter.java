@@ -1,6 +1,7 @@
 package org.prog3.lab.project.model;
 
 import javafx.beans.property.StringProperty;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -46,6 +47,6 @@ public class EmailWriter {
         }
 
         return response;
-
     }
+
 }

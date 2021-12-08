@@ -1,6 +1,9 @@
 package org.prog3.lab.project.threadModel;
 
 import java.io.*;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.nio.channels.FileChannel;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -16,6 +19,7 @@ public class SendTask implements Runnable{
     private final ObjectOutputStream outStream;
     private String wrongAddress = "";
     private ArrayList<String> listReceivers = new ArrayList<>();
+    private File file_send;
 
     public SendTask(String path, String from,  String receivers, String object, String text, ObjectOutputStream outStream) {
         this.path = path;
@@ -31,13 +35,13 @@ public class SendTask implements Runnable{
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy_HHmmss");
         String data = formatter.format(LocalDateTime.now());
 
-        File f = new File(path+data+".txt");
+        file_send = new File(path+data+".txt");
 
         String response = "";
 
         try {
 
-            if(f.exists()){
+            if(file_send.exists()){
 
                 response = "Errore durante l'invio. Riprovare.";
 
@@ -45,9 +49,9 @@ public class SendTask implements Runnable{
 
                 if(checkAddress(receivers)){
 
-                    f.createNewFile();
+                    file_send.createNewFile();
 
-                    PrintWriter out = new PrintWriter(f);
+                    PrintWriter out = new PrintWriter(file_send);
 
                     out.println("--NO_READ--");
 
@@ -60,7 +64,7 @@ public class SendTask implements Runnable{
                     writeFile(data, false, out);
                     writeFile(text, true, out);
 
-                    //for(int i=0; i<)
+                    sendToReceivers();
 
                     response = "Email inviata correttamente.";
 
@@ -117,7 +121,7 @@ public class SendTask implements Runnable{
             return true;
     }
 
-    public void writeFile(String text, boolean isTextEmail, PrintWriter out){
+    private void writeFile(String text, boolean isTextEmail, PrintWriter out){
 
         if(!isTextEmail){
             out.println("--START--");
@@ -131,4 +135,21 @@ public class SendTask implements Runnable{
 
         out.flush();
     }
+
+    private void sendToReceivers() throws IOException {
+
+        for (int i = 0; i < listReceivers.size(); i++) {
+            String path = "./server/src/org/prog3/lab/project/resources/userClients/" + listReceivers.get(i) + "/receivedEmails/";
+
+            File file_receiver = new File(path + file_send.getName() + "_" + from + ".txt");
+            file_receiver.createNewFile();
+
+            FileChannel from = new FileInputStream(file_send).getChannel();
+            FileChannel receiver = new FileOutputStream(file_receiver).getChannel();
+
+            receiver.transferFrom(from, 0, from.size());
+        }
+
+    }
+
 }

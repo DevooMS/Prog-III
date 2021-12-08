@@ -23,6 +23,7 @@ import org.prog3.lab.project.model.EmailWriter;
 
 import java.awt.*;
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 
 public class EmailClientController {
@@ -89,8 +90,6 @@ public class EmailClientController {
         if (this.model != null)
             throw new IllegalStateException("Model can only be initialized once");
 
-
-
         this.model =model;
         this.stage = stage;
         //istanza nuovo client
@@ -108,7 +107,6 @@ public class EmailClientController {
         btnDelete.setOnAction(this::btnDeleteClick);
         btnUpdate.setOnAction(this::updateEmailsLists);
         tabReceivedEmails.setOnSelectionChanged(this::updateEmailsLists);
-
 
         emptyEmail = new Email("", "", List.of(""), "", "", "");
 
@@ -154,10 +152,10 @@ public class EmailClientController {
         try {
             FXMLLoader loaderEmailWriter = new FXMLLoader(getClass().getResource("../resources/emailWriter.fxml"));
             Scene scene = new Scene(loaderEmailWriter.load());
-            EmailWriterController emailWriterController = loaderEmailWriter.getController();
-            EmailWriter model = new EmailWriter();
-            emailWriterController.initialize(model, this.model.emailAddressProperty());
             Stage writeStage = new Stage();
+            EmailWriterController emailWriterController = loaderEmailWriter.getController();
+            EmailWriter modelWriter = new EmailWriter();
+            emailWriterController.initialize(modelWriter, model, writeStage, this.model.emailAddressProperty());
             writeStage.initModality(Modality.APPLICATION_MODAL);
             writeStage.setScene(scene);
             writeStage.setMinWidth(650);
