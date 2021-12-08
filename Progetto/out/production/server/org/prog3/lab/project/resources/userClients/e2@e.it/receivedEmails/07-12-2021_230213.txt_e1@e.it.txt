@@ -1,4 +1,4 @@
---NO_READ--
+--READ--
 --START--
 e1@e.it
 --END--
@@ -13,4 +13,5 @@ funziona?
 --END--
 --START_TEXT--
 boh
+
 --END_TEXT--

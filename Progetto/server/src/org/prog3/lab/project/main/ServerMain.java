@@ -11,14 +11,15 @@ import java.net.Socket;
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
-public class ServerMain extends Thread {
+public class ServerMain {
 
     private static final int NUM_THREAD = 5;
 
-    public ServerMain(){
+    /*public ServerMain(){
         setDaemon(true);
-    }
+    }*/
 
     public static void main(String[] args) throws Exception {
 
@@ -38,8 +39,10 @@ public class ServerMain extends Thread {
             ExecutorService updateThreads = Executors.newFixedThreadPool(NUM_THREAD);
             ExecutorService sendThreads = Executors.newFixedThreadPool(NUM_THREAD);
 
+            boolean accept = true;
+
             try{
-                while(true) {
+                while(accept) {
                     Socket incoming = s.accept();
 
                     ObjectOutputStream outStream = new ObjectOutputStream(incoming.getOutputStream());
@@ -82,7 +85,15 @@ public class ServerMain extends Thread {
                         case "terminate":
                             //System.out.println("ok");
                             //System.exit(0);
+                            accept=false;
                             s.close();
+                            loginThreads.shutdown();
+                            loginThreads.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
+                            updateThreads.shutdown();
+                            updateThreads.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
+                            sendThreads.shutdown();
+                            sendThreads.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
+                            break;
                         default:
                             new IOException();
                             break;
@@ -91,7 +102,7 @@ public class ServerMain extends Thread {
             } finally {
                 s.close();
             }
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
     }
