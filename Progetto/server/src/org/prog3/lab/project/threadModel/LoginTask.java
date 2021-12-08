@@ -35,7 +35,7 @@ public class LoginTask implements Runnable{
             outStream.writeObject(response);
 
         }catch (IOException e){
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 }

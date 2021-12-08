@@ -17,11 +17,7 @@ public class ServerMain {
 
     private static final int NUM_THREAD = 5;
 
-    /*public ServerMain(){
-        setDaemon(true);
-    }*/
-
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
 
         ServerThread st = new ServerThread();
         Thread t = new Thread(st);
@@ -70,11 +66,8 @@ public class ServerMain {
                             loginThreads.execute(loginTask);
                             break;
                         case "update":
-                            //System.out.println(v.get(1)+" "+v.get(2));
-                            //System.out.println("ok");
                             path = "./server/src/org/prog3/lab/project/resources/userClients/"+v.get(1)+"/"+v.get(2);
                             Runnable updateTask = new UpdateTask(path, Boolean.parseBoolean(v.get(3)), outStream);
-                            //System.out.println(v.get(3));
                             updateThreads.execute(updateTask);
                             break;
                         case "send":
@@ -83,10 +76,7 @@ public class ServerMain {
                             sendThreads.execute(sendTask);
                             break;
                         case "terminate":
-                            //System.out.println("ok");
-                            //System.exit(0);
                             accept=false;
-                            //s.close();
                             loginThreads.shutdown();
                             loginThreads.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
                             updateThreads.shutdown();
@@ -101,6 +91,7 @@ public class ServerMain {
                 }
             } finally {
                 s.close();
+                System.out.println("Server chiuso correttamente.");
             }
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
