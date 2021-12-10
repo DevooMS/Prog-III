@@ -1,7 +1,10 @@
 package org.prog3.lab.project.ui;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -17,6 +20,8 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.stage.WindowEvent;
+import javafx.util.Duration;
 import org.prog3.lab.project.model.Email;
 import org.prog3.lab.project.model.EmailClient;
 import org.prog3.lab.project.model.EmailWriter;
@@ -25,6 +30,8 @@ import java.awt.*;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class EmailClientController {
 
@@ -81,7 +88,7 @@ public class EmailClientController {
 
     private EmailClient model;
     private Stage stage;
-    private Email selectEmail;
+    private static Email selectEmail;
     private Email emptyEmail;
     private boolean activate = false;
 
@@ -94,7 +101,14 @@ public class EmailClientController {
         this.stage = stage;
         //istanza nuovo client
         //model.generateRandomEmails(10);
-        model.updateEmailslists(true, true);  //inizio partendo con update della lista inviate
+        int countNewEmails = model.updateEmailslists(true, true);  //inizio partendo con update della lista inviate
+        if(countNewEmails > 0) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setHeaderText(null);
+            alert.setTitle("Nuove email ricevute");
+            alert.setContentText("Hai ricevuto "+ countNewEmails + "email");
+            alert.showAndWait();
+        }
         selectEmail = null;
 
         //binding tra lstEmails e inboxProperty
@@ -111,11 +125,31 @@ public class EmailClientController {
         emptyEmail = new Email("", "", List.of(""), "", "", "");
 
         viewEmailDetail(emptyEmail);
+
+        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(32), ev -> {
+            model.updateEmailslists(false, false);
+        }));
+        timeline.play();
+
+        stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent windowEvent) {
+                timeline.stop();
+            }
+        });
     }
 
     private void updateEmailsLists(Event event) {
 
-        model.updateEmailslists(false, false );
+        int countNewEmails = model.updateEmailslists(false, false );
+
+        if(countNewEmails > 0) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setHeaderText(null);
+            alert.setTitle("Nuove email ricevute");
+            alert.setContentText("Hai ricevuto "+ countNewEmails + "email");
+            alert.showAndWait();
+        }
 
     }
 
@@ -124,10 +158,9 @@ public class EmailClientController {
         if(!activate)
             activeFiled();
 
-        Email email = (Email) listReceivedEmails.getSelectionModel().getSelectedItem(); //casting ??
+        selectEmail = (Email) listReceivedEmails.getSelectionModel().getSelectedItem(); //casting ??
 
-        selectEmail = email;
-        viewEmailDetail(email);
+        viewEmailDetail(selectEmail);
     }
 
     protected void showSelectSendedEmail(MouseEvent mouseEvent) {
@@ -135,10 +168,9 @@ public class EmailClientController {
         if(!activate)
             activeFiled();
 
-        Email email = (Email) listSendedEmails.getSelectionModel().getSelectedItem();
+        selectEmail = (Email) listSendedEmails.getSelectionModel().getSelectedItem();
 
-        selectEmail = email;
-        viewEmailDetail(email);
+        viewEmailDetail(selectEmail);
     }
 
     protected void activeFiled(){

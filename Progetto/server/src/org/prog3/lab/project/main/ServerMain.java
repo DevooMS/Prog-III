@@ -13,11 +13,15 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class ServerMain {
+public class ServerMain extends Thread {
 
     private static final int NUM_THREAD = 5;
 
-    public static void main(String[] args) {
+    /*public ServerMain(){
+        setDaemon(true);
+    }*/
+
+    public static void main(String[] args) throws Exception {
 
         ServerThread st = new ServerThread();
         Thread t = new Thread(st);
@@ -35,9 +39,9 @@ public class ServerMain {
             ExecutorService updateThreads = Executors.newFixedThreadPool(NUM_THREAD);
             ExecutorService sendThreads = Executors.newFixedThreadPool(NUM_THREAD);
 
-            boolean accept = true;
-
             try{
+                boolean accept = true;
+
                 while(accept) {
                     Socket incoming = s.accept();
 
@@ -66,8 +70,11 @@ public class ServerMain {
                             loginThreads.execute(loginTask);
                             break;
                         case "update":
+                            //System.out.println(v.get(1)+" "+v.get(2));
+                            //System.out.println("ok");
                             path = "./server/src/org/prog3/lab/project/resources/userClients/"+v.get(1)+"/"+v.get(2);
                             Runnable updateTask = new UpdateTask(path, Boolean.parseBoolean(v.get(3)), outStream);
+                            //System.out.println(v.get(3));
                             updateThreads.execute(updateTask);
                             break;
                         case "send":
@@ -76,24 +83,27 @@ public class ServerMain {
                             sendThreads.execute(sendTask);
                             break;
                         case "terminate":
+                            //System.out.println("ok");
+                            //System.exit(0);
                             accept=false;
+                            //s.close();
                             loginThreads.shutdown();
                             loginThreads.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
                             updateThreads.shutdown();
                             updateThreads.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
                             sendThreads.shutdown();
                             sendThreads.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
-                            break;
                         default:
                             new IOException();
                             break;
                     }
                 }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             } finally {
                 s.close();
-                System.out.println("Server chiuso correttamente.");
             }
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

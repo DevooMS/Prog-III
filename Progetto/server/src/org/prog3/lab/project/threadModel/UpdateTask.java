@@ -20,6 +20,7 @@ public class UpdateTask implements Runnable{
             File dir = new File (directoryPath);
             File[] listOfFiles = dir.listFiles();
             int countFiles = listOfFiles.length;
+            int countNoRead = 0;
 
             outStream.writeObject(countFiles);
 
@@ -42,6 +43,7 @@ public class UpdateTask implements Runnable{
                     if(line.equals("--NO_READ--")){
                         rewrite = true;
                         fileContent.append("--READ--"+System.getProperty("line.separator"));
+                        countNoRead++;
                     }
 
                     line = reader.readLine();
@@ -105,8 +107,10 @@ public class UpdateTask implements Runnable{
                 }
 
                 outStream.writeObject("--END_EMAIL--");
-
             }
+
+            outStream.writeObject(countNoRead);
+
         }catch (IOException e) {
             e.printStackTrace();
         }

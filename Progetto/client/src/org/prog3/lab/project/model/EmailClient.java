@@ -6,15 +6,13 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.Tab;
-import org.prog3.lab.project.main.EmailClientMain;
 
+import java.awt.*;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.List;
 
 public class EmailClient {
     private final ObservableList<Email> listReceivedEmails;    //gli salvo dentro la lista di email da email.java
@@ -45,16 +43,18 @@ public class EmailClient {
         listSendedEmails.remove(email);
     }
 
-    public void updateEmailslists(boolean updateSended, boolean startUpdate){
+    public int updateEmailslists(boolean updateSended, boolean startUpdate){
 
-        serverRequestUpdateList(listReceivedEmails, "receivedEmails", startUpdate);
+        int countNewEmails = serverRequestUpdateList(listReceivedEmails, "receivedEmails", startUpdate);
 
         if(updateSended)
             serverRequestUpdateList(listSendedEmails, "sendedEmails", startUpdate);
 
+        return countNewEmails;
+
     }
 
-    private void serverRequestUpdateList(List list, String mailsType, boolean startUpdate){
+    private int serverRequestUpdateList(List list, String mailsType, boolean startUpdate){
 
         int countEmails = 0;
 
@@ -101,7 +101,11 @@ public class EmailClient {
                 }
 
                 //Collections.sort(list, Comparator.comparing((Email email) -> email.getDate()));
+                //if(list.size() > 0)
                 Collections.reverse(list);
+
+                countEmails = (Integer) inStream.readObject();
+
             }finally{
                 s.close();
             }
@@ -109,6 +113,9 @@ public class EmailClient {
         } catch (IOException | ClassNotFoundException e){
             e.printStackTrace();
         }
+
+        System.out.println(countEmails);
+        return countEmails;
 
     }
 
