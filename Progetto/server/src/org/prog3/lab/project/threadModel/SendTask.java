@@ -68,6 +68,8 @@ public class SendTask implements Runnable{
 
                     response = "Email inviata correttamente.";
 
+                    out.close();
+
                 } else{
                     wrongAddress = wrongAddress.replace(" ", "\n");
                     response = "I seguenti indirizzi non sono corretti:\n"+ wrongAddress +"\n\nControllare e riprovare";
@@ -76,6 +78,8 @@ public class SendTask implements Runnable{
             }
 
             outStream.writeObject(response);
+
+            outStream.close();
 
         } catch (IOException e) {
 
@@ -148,6 +152,9 @@ public class SendTask implements Runnable{
             FileChannel receiver = new FileOutputStream(file_receiver).getChannel();
 
             receiver.transferFrom(from, 0, from.size());
+
+            from.close();
+            receiver.close();
         }
 
     }

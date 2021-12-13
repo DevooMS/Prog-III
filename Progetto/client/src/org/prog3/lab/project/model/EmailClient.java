@@ -39,22 +39,27 @@ public class EmailClient {
         return emailAddress;
     }
 
-    public void deleteEmail(Email email) {
-        listSendedEmails.remove(email);
+    public void deleteEmail(Email email, String emailsType, String emailId ) {
+        serverRemoveEmail(emailsType, emailId);
+
+        if(emailsType.equals("receivedEmails"))
+            listReceivedEmails.remove(email);
+        if(emailsType.equals("sendedEmails"))
+            listSendedEmails.remove(email);
     }
 
     public int updateEmailslists(boolean updateSended, boolean startUpdate){
 
-        int countNewEmails = serverRequestUpdateList(listReceivedEmails, "receivedEmails", startUpdate);
-
         if(updateSended)
             serverRequestUpdateList(listSendedEmails, "sendedEmails", startUpdate);
+
+        int countNewEmails = serverRequestUpdateList(listReceivedEmails, "receivedEmails", startUpdate);
 
         return countNewEmails;
 
     }
 
-    private int serverRequestUpdateList(List list, String mailsType, boolean startUpdate){
+    private int serverRequestUpdateList(ObservableList list, String mailsType, boolean startUpdate){
 
         int countEmails = 0;
 
@@ -100,10 +105,6 @@ public class EmailClient {
 
                 }
 
-                //Collections.sort(list, Comparator.comparing((Email email) -> email.getDate()));
-                //if(list.size() > 0)
-                Collections.reverse(list);
-
                 countEmails = (Integer) inStream.readObject();
 
             }finally{
@@ -114,8 +115,37 @@ public class EmailClient {
             e.printStackTrace();
         }
 
-        System.out.println(countEmails);
+        //System.out.println(countEmails);
         return countEmails;
+
+    }
+
+    private void serverRemoveEmail(String mailsType, String emailId){
+
+        try {
+            Socket s = new Socket(InetAddress.getLocalHost().getHostName(), 8190);
+
+            try {
+
+                ObjectOutputStream outStream = new ObjectOutputStream(s.getOutputStream());
+
+                ObjectInputStream inStream = new ObjectInputStream(s.getInputStream());
+
+                Vector<String> operationRequest = new Vector<>();
+                operationRequest.add("remove");
+                operationRequest.add(emailAddressProperty().get());
+                operationRequest.add(mailsType);
+                operationRequest.add(emailId);
+
+                outStream.writeObject(operationRequest);
+
+            }finally{
+                s.close();
+            }
+
+        } catch (IOException e){
+            e.printStackTrace();
+        }
 
     }
 

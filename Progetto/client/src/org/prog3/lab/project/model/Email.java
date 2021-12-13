@@ -1,6 +1,7 @@
 package org.prog3.lab.project.model;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class Email {
@@ -50,4 +51,5 @@ public class Email {
     public String toString() {
         return this.sender + " - " + this.date + "\n" + this.object;
     }
+
 }

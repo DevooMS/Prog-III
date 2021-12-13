@@ -67,8 +67,8 @@ public class EmailWriterController {
         alert.showAndWait();
 
         if(response.equals("Email inviata correttamente.")) {
-            writeStage.close();
             modelClient.updateEmailslists(true, false);
+            writeStage.close();
         }
     }
 

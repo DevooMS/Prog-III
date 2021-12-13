@@ -97,6 +97,8 @@ public class UpdateTask implements Runnable{
 
                 }
 
+                reader.close();
+
                 if(rewrite) {
                     FileWriter fstreamWrite = new FileWriter(directoryPath + "/"+ listOfFiles[i].getName());
                     BufferedWriter out = new BufferedWriter(fstreamWrite);
@@ -110,6 +112,8 @@ public class UpdateTask implements Runnable{
             }
 
             outStream.writeObject(countNoRead);
+
+            outStream.close();
 
         }catch (IOException e) {
             e.printStackTrace();

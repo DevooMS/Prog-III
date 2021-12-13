@@ -1,9 +1,6 @@
 package org.prog3.lab.project.main;
 
-import org.prog3.lab.project.threadModel.LoginTask;
-import org.prog3.lab.project.threadModel.SendTask;
-import org.prog3.lab.project.threadModel.ServerThread;
-import org.prog3.lab.project.threadModel.UpdateTask;
+import org.prog3.lab.project.threadModel.*;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -38,6 +35,7 @@ public class ServerMain extends Thread {
             ExecutorService loginThreads = Executors.newFixedThreadPool(NUM_THREAD);
             ExecutorService updateThreads = Executors.newFixedThreadPool(NUM_THREAD);
             ExecutorService sendThreads = Executors.newFixedThreadPool(NUM_THREAD);
+            ExecutorService removeThreads = Executors.newFixedThreadPool(NUM_THREAD);
 
             try{
                 boolean accept = true;
@@ -81,6 +79,11 @@ public class ServerMain extends Thread {
                             path = "./server/src/org/prog3/lab/project/resources/userClients/"+v.get(1)+"/sendedEmails/";
                             Runnable sendTask = new SendTask(path, v.get(1), v.get(2), v.get(3), v.get(4), outStream);
                             sendThreads.execute(sendTask);
+                            break;
+                        case "remove":
+                            path = "./server/src/org/prog3/lab/project/resources/userClients/"+v.get(1)+"/"+v.get(2)+"/"+v.get(3);
+                            Runnable removeTask = new RemoveTask(path);
+                            removeThreads.execute(removeTask);
                             break;
                         case "terminate":
                             //System.out.println("ok");
