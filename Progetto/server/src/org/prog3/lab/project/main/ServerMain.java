@@ -96,6 +96,8 @@ public class ServerMain extends Thread {
                             updateThreads.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
                             sendThreads.shutdown();
                             sendThreads.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
+                            removeThreads.shutdown();
+                            removeThreads.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
                         default:
                             new IOException();
                             break;
