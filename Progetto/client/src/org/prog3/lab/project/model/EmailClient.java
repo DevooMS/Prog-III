@@ -39,12 +39,12 @@ public class EmailClient {
         return emailAddress;
     }
 
-    public void deleteEmail(Email email, String emailsType, String emailId ) {
-        serverRemoveEmail(emailsType, emailId);
+    public void deleteEmail(Email email) {
+        serverRemoveEmail(email.getType(), email.getId());
 
-        if(emailsType.equals("receivedEmails"))
+        if(email.getType().equals("receivedEmails"))
             listReceivedEmails.remove(email);
-        if(emailsType.equals("sendedEmails"))
+        else
             listSendedEmails.remove(email);
     }
 
@@ -59,7 +59,7 @@ public class EmailClient {
 
     }
 
-    private int serverRequestUpdateList(ObservableList list, String mailsType, boolean startUpdate){
+    private int serverRequestUpdateList(ObservableList list, String mailType, boolean startUpdate){
 
         int countEmails = 0;
 
@@ -75,7 +75,7 @@ public class EmailClient {
                 Vector<String> operationRequest = new Vector<>();
                 operationRequest.add("update");
                 operationRequest.add(emailAddressProperty().get());
-                operationRequest.add(mailsType);
+                operationRequest.add(mailType);
                 operationRequest.add(String.valueOf(startUpdate));
 
                 outStream.writeObject(operationRequest);
@@ -93,13 +93,11 @@ public class EmailClient {
                     while (!email.equals("--END_EMAIL--")) {
                         emailDetail.add(j, email);
                         j++;
-                        //System.out.println(email);
                         email = (String) inStream.readObject();
                     }
 
                     if(emailDetail.size() > 0) {
-                        //System.out.println(emailDetail.get(0)+" "+emailDetail.get(1)+" "+Collections.singletonList(emailDetail.get(2))+" "+emailDetail.get(3)+" "+emailDetail.get(4)+" "+emailDetail.get(5));
-                        Email e = new Email(emailDetail.get(0), emailDetail.get(1), Collections.singletonList(emailDetail.get(2)), emailDetail.get(3), emailDetail.get(4), emailDetail.get(5));   //nuovo oggetto email 
+                        Email e = new Email(emailDetail.get(0), mailType, emailDetail.get(1), emailDetail.get(2), emailDetail.get(3), emailDetail.get(4), emailDetail.get(5));   //nuovo oggetto email
                         list.add(e);
                     }
 
@@ -115,12 +113,11 @@ public class EmailClient {
             e.printStackTrace();
         }
 
-        //System.out.println(countEmails);
         return countEmails;
 
     }
 
-    private void serverRemoveEmail(String mailsType, String emailId){
+    private void serverRemoveEmail(String emailType, String emailId){
 
         try {
             Socket s = new Socket(InetAddress.getLocalHost().getHostName(), 8190);
@@ -129,12 +126,10 @@ public class EmailClient {
 
                 ObjectOutputStream outStream = new ObjectOutputStream(s.getOutputStream());
 
-                ObjectInputStream inStream = new ObjectInputStream(s.getInputStream());
-
                 Vector<String> operationRequest = new Vector<>();
                 operationRequest.add("remove");
                 operationRequest.add(emailAddressProperty().get());
-                operationRequest.add(mailsType);
+                operationRequest.add(emailType);
                 operationRequest.add(emailId);
 
                 outStream.writeObject(operationRequest);

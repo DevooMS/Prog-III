@@ -41,7 +41,7 @@ public class EmailWriterController {
     private Stage writeStage;
 
     @FXML
-    public void initialize(EmailWriter modelWriter, EmailClient modelClient, Stage writeStage, StringProperty emailAddress){
+    public void initialize(EmailWriter modelWriter, EmailClient modelClient, Stage writeStage, StringProperty emailAddress, String to, String object, String text){
         if (this.modelWriter != null)
             throw new IllegalStateException("Model can only be initialized once");
 
@@ -50,10 +50,18 @@ public class EmailWriterController {
         this.writeStage = writeStage;
         this.emailAddress = emailAddress;
 
+        if(to!=null && object!=null && text!=null){
+            textReceivers.setText(to);
+            textObject.setText(object);
+            textEmail.setText("\n\n\n--- Messaggio originale ---\n\n"+text);
+        }
+
         textReceivers.setOnKeyReleased(this::keyReleased);
         labelError.setStyle("-fx-text-fill: red");
 
-        btnSend.setDisable(true);
+        if(textReceivers.getText().equals(""))
+            btnSend.setDisable(true);
+
         btnSend.setOnAction(this::btnSendClick);
     }
 

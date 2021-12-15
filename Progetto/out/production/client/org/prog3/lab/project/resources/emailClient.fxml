@@ -120,19 +120,24 @@
                               <Insets bottom="80.0" left="60.0" right="50.0" top="150.0" />
                            </StackPane.margin>
                         </TextArea>
-                        <Button fx:id="btnReply" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="70.0" text="Rispondi" StackPane.alignment="BOTTOM_LEFT">
+                        <Button fx:id="btnReply" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="75.0" text="Rispondi" StackPane.alignment="BOTTOM_CENTER">
                            <StackPane.margin>
-                              <Insets bottom="15.0" left="60.0" />
+                              <Insets bottom="15.0" right="250.0" />
                            </StackPane.margin>
                         </Button>
-                        <Button fx:id="btnReplyAll" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="70.0" text="Rispondi a tutti" textAlignment="CENTER" wrapText="true" StackPane.alignment="BOTTOM_CENTER">
+                        <Button fx:id="btnReplyAll" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="75.0" text="Rispondi a tutti" textAlignment="CENTER" wrapText="true" StackPane.alignment="BOTTOM_CENTER">
                            <StackPane.margin>
-                              <Insets bottom="15.0" left="20.0" />
+                              <Insets bottom="15.0" right="75.0" />
                            </StackPane.margin>
                         </Button>
-                        <Button fx:id="btnDelete" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="70.0" text="Elimina" StackPane.alignment="BOTTOM_RIGHT">
+                        <Button fx:id="btnForward" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="75.0" text="Inoltra" textAlignment="CENTER" wrapText="true" StackPane.alignment="BOTTOM_CENTER">
                            <StackPane.margin>
-                              <Insets bottom="15.0" right="50.0" />
+                              <Insets bottom="15.0" left="100.0" />
+                           </StackPane.margin>
+                        </Button>
+                        <Button fx:id="btnDelete" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="75.0" text="Elimina" textAlignment="CENTER" wrapText="true" StackPane.alignment="BOTTOM_CENTER">
+                           <StackPane.margin>
+                              <Insets bottom="15.0" left="275.0" />
                            </StackPane.margin>
                         </Button>
                      </children>

@@ -79,6 +79,9 @@ public class EmailClientController {
     private Button btnReplyAll;
 
     @FXML
+    private Button btnForward;
+
+    @FXML
     private Button btnDelete;
 
     @FXML
@@ -110,12 +113,13 @@ public class EmailClientController {
         listReceivedEmails.setOnMouseClicked(this::showSelectReceivedEmail);    //this prende il metodo showselectRecivedEmail e gli passa mouse event
         listSendedEmails.itemsProperty().bind(model.sendedEmailsProperty());
         listSendedEmails.setOnMouseClicked(this::showSelectSendedEmail);
+        btnReply.setOnAction(this::btnReplyClick);
         btnNewEmail.setOnAction(this::btnNewEmailClick);
         btnDelete.setOnAction(this::btnDeleteClick);
         btnUpdate.setOnAction(this::updateEmailsLists);
         tabReceivedEmails.setOnSelectionChanged(this::updateEmailsLists);
 
-        emptyEmail = new Email("", "", List.of(""), "", "", "");
+        emptyEmail = new Email("", "","", "", "", "", "");
 
         viewEmailDetail(emptyEmail);
 
@@ -134,7 +138,19 @@ public class EmailClientController {
     }
 
     private void updateEmailsLists(Event event) {
+
+        if(!btnReply.isDisable() && !btnReplyAll.isDisable() && !btnForward.isDisable()) {
+            btnReply.setDisable(true);
+            btnReplyAll.setDisable(true);
+            btnForward.setDisable(true);
+        }else{
+            btnReply.setDisable(false);
+            btnReplyAll.setDisable(false);
+            btnForward.setDisable(false);
+        }
+
         showEmails(false, false);
+
     }
 
     private void showEmails(boolean updateSended, boolean startUpdate){
@@ -157,6 +173,7 @@ public class EmailClientController {
 
         selectEmail = (Email) listReceivedEmails.getSelectionModel().getSelectedItem(); //casting ??
 
+
         viewEmailDetail(selectEmail);
     }
 
@@ -178,13 +195,25 @@ public class EmailClientController {
 
     private void btnNewEmailClick(ActionEvent actionEvent) {
 
+        showEmailWriter(null, null, null);
+
+    }
+
+    private void btnReplyClick(ActionEvent actionEvent) {
+
+        showEmailWriter(selectEmail.getSender(), selectEmail.getObject(), selectEmail.getText());
+
+    }
+
+    private void showEmailWriter(String to, String object, String text){
+
         try {
             FXMLLoader loaderEmailWriter = new FXMLLoader(getClass().getResource("../resources/emailWriter.fxml"));
             Scene scene = new Scene(loaderEmailWriter.load());
             Stage writeStage = new Stage();
             EmailWriterController emailWriterController = loaderEmailWriter.getController();
             EmailWriter modelWriter = new EmailWriter();
-            emailWriterController.initialize(modelWriter, model, writeStage, this.model.emailAddressProperty());
+            emailWriterController.initialize(modelWriter, model, writeStage, this.model.emailAddressProperty(), to, object, text);
             writeStage.initModality(Modality.APPLICATION_MODAL);
             writeStage.setScene(scene);
             writeStage.setMinWidth(650);
@@ -194,7 +223,6 @@ public class EmailClientController {
             writeStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
                 @Override
                 public void handle(WindowEvent windowEvent) {
-                    System.out.println("tiraporco");
                     showEmails(true, false);
                 }
             });
@@ -210,10 +238,10 @@ public class EmailClientController {
     protected void btnDeleteClick(ActionEvent actionEvent){
 
         if(tabReceivedEmails.isSelected()){
-            model.deleteEmail(selectEmail, "receivedEmails", selectEmail.getId());
+            model.deleteEmail(selectEmail);
         }
         if(tabSendedEmails.isSelected()){
-            model.deleteEmail(selectEmail, "sendedEmails", selectEmail.getId());
+            model.deleteEmail(selectEmail);
         }
 
 
@@ -223,7 +251,7 @@ public class EmailClientController {
     protected void viewEmailDetail(Email email) {
         if(email != null) {
             textFrom.setText(email.getSender());    //campi assegnati da scenebuilder fx::ID
-            textReceivers.setText(String.join(", ", email.getReceivers()));
+            textReceivers.setText(email.getReceivers());
             textObject.setText(email.getObject());
             fieldDateHour.setText(email.getDate());
             textEmail.setText(email.getText());

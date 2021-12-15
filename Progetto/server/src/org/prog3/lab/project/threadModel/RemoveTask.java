@@ -14,10 +14,7 @@ public class RemoveTask implements Runnable {
         try {
             File file_remove = new File(path);
 
-            //file_remove.setWritable(true);
-            //System.gc();
             file_remove.delete();
-            //System.gc();
         }catch(Exception e){
             System.out.println(e.getMessage());
         }

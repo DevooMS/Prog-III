@@ -1,22 +1,23 @@
 package org.prog3.lab.project.model;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public class Email {
 
     private final String id;
+    private final String type;
     private final String sender;
-    private final List<String> receivers;
+    private final String receivers;
     private final String object;
     private final String date;
     private final String text;
 
-    public Email(String id, String sender, List<String> receivers, String object, String date, String text){
+    public Email(String id, String type, String sender, String receivers, String object, String date, String text){
         this.id = id;
+        this.type = type;
         this.sender = sender;
-        this.receivers = new ArrayList<>(receivers);
+        this.receivers = receivers;
         this.object = object;
         this.date = date;
         this.text = text;
@@ -26,11 +27,15 @@ public class Email {
         return id;
     }
 
+    public String getType() {
+        return type;
+    }
+
     public String getSender() {
         return sender;
     }
 
-    public List<String> getReceivers() {
+    public String getReceivers() {
         return receivers;
     }
 
