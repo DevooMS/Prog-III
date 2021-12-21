@@ -2,37 +2,26 @@ package org.prog3.lab.project.ui;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import org.prog3.lab.project.model.Email;
 import org.prog3.lab.project.model.EmailClient;
 import org.prog3.lab.project.model.EmailWriter;
-
-import java.awt.*;
-import java.io.IOException;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class EmailClientController {
 
@@ -44,6 +33,9 @@ public class EmailClientController {
 
     @FXML
     private Button btnUpdate;
+
+    @FXML
+    private Label labelError;
 
     @FXML
     private ListView listReceivedEmails;
@@ -114,6 +106,8 @@ public class EmailClientController {
         listSendedEmails.itemsProperty().bind(model.sendedEmailsProperty());
         listSendedEmails.setOnMouseClicked(this::showSelectSendedEmail);
         btnReply.setOnAction(this::btnReplyClick);
+        btnReplyAll.setOnAction(this::btnReplyAllClick);
+        btnForward.setOnAction(this::btnForwardClick);
         btnNewEmail.setOnAction(this::btnNewEmailClick);
         btnDelete.setOnAction(this::btnDeleteClick);
         btnUpdate.setOnAction(this::updateEmailsLists);
@@ -139,16 +133,6 @@ public class EmailClientController {
 
     private void updateEmailsLists(Event event) {
 
-        if(!btnReply.isDisable() && !btnReplyAll.isDisable() && !btnForward.isDisable()) {
-            btnReply.setDisable(true);
-            btnReplyAll.setDisable(true);
-            btnForward.setDisable(true);
-        }else{
-            btnReply.setDisable(false);
-            btnReplyAll.setDisable(false);
-            btnForward.setDisable(false);
-        }
-
         showEmails(false, false);
 
     }
@@ -156,8 +140,8 @@ public class EmailClientController {
     private void showEmails(boolean updateSended, boolean startUpdate){
         int countNewEmails = model.updateEmailslists(updateSended, startUpdate );
 
-        //System.out.println(countNewEmails);
         if(countNewEmails > 0) {
+            labelError.setVisible(false);
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setHeaderText(null);
             alert.setTitle("Nuove email ricevute");
@@ -173,6 +157,7 @@ public class EmailClientController {
 
         selectEmail = (Email) listReceivedEmails.getSelectionModel().getSelectedItem(); //casting ??
 
+        btnShow();
 
         viewEmailDetail(selectEmail);
     }
@@ -184,7 +169,26 @@ public class EmailClientController {
 
         selectEmail = (Email) listSendedEmails.getSelectionModel().getSelectedItem();
 
+        btnShow();
+
         viewEmailDetail(selectEmail);
+    }
+
+    protected void btnShow(){
+        if(selectEmail.getType().equals("sendedEmails")){
+            if(!btnReply.isDisable() && !btnReplyAll.isDisable() && !btnForward.isDisable()){
+                btnReply.setDisable(true);
+                btnReplyAll.setDisable(true);
+                btnForward.setDisable(true);
+            }
+        } else{
+            if(btnReply.isDisable() && btnReplyAll.isDisable() && btnForward.isDisable()) {
+                btnReply.setDisable(false);
+                btnReplyAll.setDisable(false);
+                btnForward.setDisable(false);
+            }
+        }
+
     }
 
     protected void activeFiled(){
@@ -201,8 +205,16 @@ public class EmailClientController {
 
     private void btnReplyClick(ActionEvent actionEvent) {
 
-        showEmailWriter(selectEmail.getSender(), selectEmail.getObject(), selectEmail.getText());
+        showEmailWriter(selectEmail.getSender(), "R: "+ selectEmail.getObject(), selectEmail.getText());
 
+    }
+
+    private void btnReplyAllClick(ActionEvent actionEvent) {
+        showEmailWriter(selectEmail.getSender() +","+selectEmail.getReceivers(), "R: "+ selectEmail.getObject(), selectEmail.getText());
+    }
+
+    private void btnForwardClick(ActionEvent actionEvent) {
+        showEmailWriter("", "I: "+ selectEmail.getObject(), selectEmail.getText());
     }
 
     private void showEmailWriter(String to, String object, String text){

@@ -1,8 +1,5 @@
 package org.prog3.lab.project.main;
 
-import java.time.format.DateTimeFormatter;
-import java.time.LocalDateTime;
-
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -11,8 +8,6 @@ import org.prog3.lab.project.model.Login;
 import org.prog3.lab.project.ui.LoginController;
 
 public class EmailClientMain extends Application {
-
-    private static String data;
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -30,18 +25,10 @@ public class EmailClientMain extends Application {
         stage.setResizable(false);
         stage.show();
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-        data = formatter.format(LocalDateTime.now());
-        //Email a = new Email("1", "", Collections.singletonList(""), "", data.toString(),"");
-        //list.add(a);
-
     }
 
     public static void main(String[] args) {
         launch();
     }
 
-    public static String getDate(){
-        return data.toString();
-    }
 }

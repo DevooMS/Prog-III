@@ -7,12 +7,10 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import java.awt.*;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.*;
-import java.util.List;
 
 public class EmailClient {
     private final ObservableList<Email> listReceivedEmails;    //gli salvo dentro la lista di email da email.java
@@ -50,10 +48,12 @@ public class EmailClient {
 
     public int updateEmailslists(boolean updateSended, boolean startUpdate){
 
+        int countNewEmails;
+
         if(updateSended)
             serverRequestUpdateList(listSendedEmails, "sendedEmails", startUpdate);
 
-        int countNewEmails = serverRequestUpdateList(listReceivedEmails, "receivedEmails", startUpdate);
+        countNewEmails = serverRequestUpdateList(listReceivedEmails, "receivedEmails", startUpdate);
 
         return countNewEmails;
 
@@ -97,7 +97,12 @@ public class EmailClient {
                     }
 
                     if(emailDetail.size() > 0) {
-                        Email e = new Email(emailDetail.get(0), mailType, emailDetail.get(1), emailDetail.get(2), emailDetail.get(3), emailDetail.get(4), emailDetail.get(5));   //nuovo oggetto email
+                        Email e;
+
+                        if(mailType.equals("receivedEmails"))
+                             e = new Email(emailDetail.get(0), mailType, emailDetail.get(1), emailDetail.get(2), emailDetail.get(3), emailDetail.get(4), emailDetail.get(5));   //nuovo oggetto email
+                        else
+                             e = new Email(emailDetail.get(0), mailType, emailDetail.get(2), emailDetail.get(1), emailDetail.get(3), emailDetail.get(4), emailDetail.get(5));
                         list.add(e);
                     }
 

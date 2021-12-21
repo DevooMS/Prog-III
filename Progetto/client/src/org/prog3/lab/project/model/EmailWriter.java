@@ -1,21 +1,19 @@
 package org.prog3.lab.project.model;
 
 import javafx.beans.property.StringProperty;
-import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.Collections;
 import java.util.Vector;
 
 public class EmailWriter {
 
     public String serverSendEmail(StringProperty emailAddress, String receivers, String object, String text){
 
-        String response = "";
+        String response;
 
         try {
             Socket s = new Socket(InetAddress.getLocalHost().getHostName(), 8190);

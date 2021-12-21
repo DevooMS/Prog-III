@@ -13,7 +13,6 @@ import javafx.stage.Stage;
 import org.prog3.lab.project.model.EmailClient;
 import org.prog3.lab.project.model.Login;
 
-import java.io.IOException;
 
 public class LoginController {
     @FXML
@@ -49,7 +48,7 @@ public class LoginController {
         try {
             labelResult.setStyle("-fx-text-fill:GREEN");
             labelResult.setText("Login incorso. Attendere...");
-            String access = model.searchUser(fieldEmail.getText(), fieldPassword.getText(), labelResult);
+            String access = model.searchUser(fieldEmail.getText(), fieldPassword.getText());
             //System.out.println(access);
             if (access.equals("accept")) {
                 loadEmailClient();
@@ -72,7 +71,7 @@ public class LoginController {
 
 
 
-    public void loadEmailClient() throws Exception{
+    public void loadEmailClient() {
         try{
             FXMLLoader loaderEmailClient = new FXMLLoader(getClass().getResource("../resources/emailClient.fxml"));
             Scene scene = new Scene(loaderEmailClient.load());

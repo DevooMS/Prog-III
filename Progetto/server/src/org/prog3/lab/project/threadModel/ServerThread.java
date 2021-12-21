@@ -6,7 +6,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import org.prog3.lab.project.ui.ServerController;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -22,7 +21,7 @@ public class ServerThread extends Application implements Runnable {
     }
 
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage) {
         FXMLLoader loaderServerPanel = new FXMLLoader(getClass().getResource("../ui/panelAdmin.fxml"));
         Scene scene = null;
         try {
@@ -31,7 +30,7 @@ public class ServerThread extends Application implements Runnable {
             e.printStackTrace();
         }
 
-        ServerController loaderController = loaderServerPanel.getController();
+        //ServerController loaderController = loaderServerPanel.getController();
         stage.setTitle("main page");
         stage.setScene(scene);
         stage.setMinWidth(741);

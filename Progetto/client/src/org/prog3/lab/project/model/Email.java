@@ -1,8 +1,5 @@
 package org.prog3.lab.project.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Email {
 
     private final String id;

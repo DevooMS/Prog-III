@@ -1,7 +1,6 @@
 package org.prog3.lab.project.threadModel;
 
 import java.io.*;
-import java.net.Socket;
 
 public class LoginTask implements Runnable{
     private final String email;

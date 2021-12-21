@@ -1,13 +1,10 @@
 package org.prog3.lab.project.threadModel;
 
 import java.io.*;
-import java.net.InetAddress;
-import java.net.Socket;
 import java.nio.channels.FileChannel;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Vector;
 
 public class SendTask implements Runnable{
 
@@ -17,8 +14,8 @@ public class SendTask implements Runnable{
     String object;
     String text;
     private final ObjectOutputStream outStream;
+    private final ArrayList<String> listReceivers = new ArrayList<>();
     private String wrongAddress = "";
-    private ArrayList<String> listReceivers = new ArrayList<>();
     private File file_send;
 
     public SendTask(String path, String from,  String receivers, String object, String text, ObjectOutputStream outStream) {
@@ -37,7 +34,7 @@ public class SendTask implements Runnable{
 
         file_send = new File(path+data+".txt");
 
-        String response = "";
+        String response;
 
         try {
 
@@ -47,33 +44,30 @@ public class SendTask implements Runnable{
 
             }else {
 
-                if(checkAddress(receivers)){
+                //if(checkAddress(receivers)){
 
-                    file_send.createNewFile();
+                checkAddress(receivers);
 
-                    PrintWriter out = new PrintWriter(file_send);
+                file_send.createNewFile();
 
-                    out.println("--NO_READ--");
+                PrintWriter out = new PrintWriter(file_send);
 
-                    formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-                    data = formatter.format(LocalDateTime.now());
+                out.println("--NO_READ--");
 
-                    writeFile(from, false, out);
-                    writeFile(receivers, false, out);
-                    writeFile(object, false, out);
-                    writeFile(data, false, out);
-                    writeFile(text, true, out);
+                formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+                data = formatter.format(LocalDateTime.now());
 
-                    sendToReceivers();
+                writeFile(from, false, out);
+                writeFile(receivers, false, out);
+                writeFile(object, false, out);
+                writeFile(data, false, out);
+                writeFile(text, true, out);
 
-                    response = "Email inviata correttamente.";
+                out.close();
 
-                    out.close();
+                sendToReceivers();
 
-                } else{
-                    wrongAddress = wrongAddress.replace(" ", "\n");
-                    response = "I seguenti indirizzi non sono corretti:\n"+ wrongAddress +"\n\nControllare e riprovare";
-                }
+                response = "Email inviata correttamente.";
 
             }
 
@@ -89,13 +83,11 @@ public class SendTask implements Runnable{
 
     }
 
-    private boolean checkAddress(String receivers){
+    private void checkAddress(String receivers){
 
         String path = "./server/src/org/prog3/lab/project/resources/userClients/";
         int start=0;
         int end = 0;
-
-        wrongAddress = "";
 
         while(end>=0){
 
@@ -108,21 +100,18 @@ public class SendTask implements Runnable{
             else
                 receiver = receivers.substring(start, receivers.length());
 
-            listReceivers.add(receiver);
+            //listReceivers.add(receiver);
 
-            File folder = new File(path+receiver);
+            File folder = new File(path + receiver);
 
-            if(!folder.isDirectory())
-                wrongAddress += receiver+" ";
+            if(receiver.equals(from) || !folder.isDirectory()){
+                wrongAddress += receiver + " ";
+            } else {
+                listReceivers.add(receiver);
+            }
 
             start = end+1;
         }
-
-        if(wrongAddress.length() > 0) {
-            listReceivers = null;
-            return false;
-        }else
-            return true;
     }
 
     private void writeFile(String text, boolean isTextEmail, PrintWriter out){
@@ -155,6 +144,31 @@ public class SendTask implements Runnable{
 
             from.close();
             receiver.close();
+        }
+
+        if(wrongAddress.length() > 0){
+            wrongAddress = wrongAddress.replace(" ", "\n");
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy_HHmmss");
+            String data = formatter.format(LocalDateTime.now());
+
+            File file_error;
+            file_error = new File("./server/src/org/prog3/lab/project/resources/userClients/"+from+"/receivedEmails/"+data+".txt");
+
+            PrintWriter out = new PrintWriter(file_error);
+
+            out.println("--NO_READ--");
+
+            formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+            data = formatter.format(LocalDateTime.now());
+
+            writeFile("no reply", false, out);
+            writeFile(from, false, out);
+            writeFile("Indirizzi email errati", false, out);
+            writeFile(data, false, out);
+            writeFile("Nella mail con oggetto \""+object+"\", iseguenti indirizzi email sono errati: \n\n"+wrongAddress+"\n\nN:B:: si prega di non rispondere a questa email.", true, out);
+
+            out.close();
         }
 
     }

@@ -18,7 +18,7 @@
             <Insets left="80.0" right="20.0" top="10.0" />
          </StackPane.margin>
       </TextArea>
-      <Label fx:id="labelError" text="Controllare il fromato (ad es. mario.rossi@email.it). Nel caso di più email separarle da una , ." visible="false" StackPane.alignment="TOP_CENTER">
+      <Label fx:id="labelError" text="Controllare il fromato (ad es. mario.rossi@email.it). Nel caso di più email separarle da una ," visible="false" StackPane.alignment="TOP_CENTER">
          <StackPane.margin>
             <Insets left="60.0" top="36.0" />
          </StackPane.margin>

@@ -1,19 +1,14 @@
 package org.prog3.lab.project.ui;
 
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.input.InputMethodEvent;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import org.prog3.lab.project.model.EmailClient;
 import org.prog3.lab.project.model.EmailWriter;
 
-import java.io.IOException;
 import java.util.regex.Pattern;
 
 

@@ -5,12 +5,11 @@ import javafx.scene.control.Label;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.Scanner;
 import java.util.Vector;
 
 public class Login {
 
-    public String searchUser(String userEmail, String userPassword, Label labelResult) throws IOException {
+    public String searchUser(String userEmail, String userPassword) {
 
         String response = "denied";
 

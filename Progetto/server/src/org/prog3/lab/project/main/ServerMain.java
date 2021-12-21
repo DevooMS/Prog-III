@@ -14,10 +14,6 @@ public class ServerMain extends Thread {
 
     private static final int NUM_THREAD = 5;
 
-    /*public ServerMain(){
-        setDaemon(true);
-    }*/
-
     public static void main(String[] args) throws Exception {
 
         ServerThread st = new ServerThread();
