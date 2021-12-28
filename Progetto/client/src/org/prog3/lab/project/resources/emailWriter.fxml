@@ -43,5 +43,10 @@
             <Insets bottom="15.0" />
          </StackPane.margin>
       </Button>
+      <Label fx:id="sendResult" minHeight="-Infinity" visible="false" StackPane.alignment="BOTTOM_CENTER">
+         <StackPane.margin>
+            <Insets bottom="20.0" />
+         </StackPane.margin>
+      </Label>
    </children>
 </StackPane>

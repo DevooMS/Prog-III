@@ -1,5 +1,7 @@
 package org.prog3.lab.project.threadModel;
 
+import org.prog3.lab.project.model.User;
+
 import java.io.*;
 import java.nio.channels.FileChannel;
 import java.time.LocalDateTime;
@@ -9,7 +11,8 @@ import java.util.ArrayList;
 public class SendTask implements Runnable{
 
     String path;
-    String from;
+    //String from;
+    User user;
     String receivers;
     String object;
     String text;
@@ -18,9 +21,10 @@ public class SendTask implements Runnable{
     private String wrongAddress = "";
     private File file_send;
 
-    public SendTask(String path, String from,  String receivers, String object, String text, ObjectOutputStream outStream) {
+    public SendTask(String path, User user /*String from*/,  String receivers, String object, String text, ObjectOutputStream outStream) {
         this.path = path;
-        this.from = from;
+        //this.from = from;
+        this.user = user;
         this.receivers = receivers;
         this.object = object;
         this.text = text;
@@ -53,17 +57,21 @@ public class SendTask implements Runnable{
                 PrintWriter out = new PrintWriter(file_send);
 
                 out.println("--NO_READ--");
+                try {
+                    user.getReadWrite().acquire();
+                    formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+                    data = formatter.format(LocalDateTime.now());
 
-                formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-                data = formatter.format(LocalDateTime.now());
+                    writeFile(user.getUserEmail(), false, out);
+                    writeFile(receivers, false, out);
+                    writeFile(object, false, out);
+                    writeFile(data, false, out);
+                    writeFile(text, true, out);
 
-                writeFile(from, false, out);
-                writeFile(receivers, false, out);
-                writeFile(object, false, out);
-                writeFile(data, false, out);
-                writeFile(text, true, out);
-
-                out.close();
+                    out.close();
+                } finally{
+                    user.getReadWrite().release();;
+                }
 
                 sendToReceivers();
 
@@ -75,7 +83,7 @@ public class SendTask implements Runnable{
 
             outStream.close();
 
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
 
             e.printStackTrace();
 
@@ -104,7 +112,7 @@ public class SendTask implements Runnable{
 
             File folder = new File(path + receiver);
 
-            if(receiver.equals(from) || !folder.isDirectory()){
+            if(receiver.equals(user.getUserEmail()) || !folder.isDirectory()){
                 wrongAddress += receiver + " ";
             } else {
                 listReceivers.add(receiver);
@@ -134,7 +142,7 @@ public class SendTask implements Runnable{
         for (int i = 0; i < listReceivers.size(); i++) {
             String path = "./server/src/org/prog3/lab/project/resources/userClients/" + listReceivers.get(i) + "/receivedEmails/";
 
-            File file_receiver = new File(path + file_send.getName() + "_" + from + ".txt");
+            File file_receiver = new File(path + file_send.getName() + "_" + user.getUserEmail() + ".txt");
             file_receiver.createNewFile();
 
             FileChannel from = new FileInputStream(file_send).getChannel();
@@ -153,7 +161,7 @@ public class SendTask implements Runnable{
             String data = formatter.format(LocalDateTime.now());
 
             File file_error;
-            file_error = new File("./server/src/org/prog3/lab/project/resources/userClients/"+from+"/receivedEmails/"+data+".txt");
+            file_error = new File("./server/src/org/prog3/lab/project/resources/userClients/"+user.getUserEmail()+"/receivedEmails/"+data+".txt");
 
             PrintWriter out = new PrintWriter(file_error);
 
@@ -163,7 +171,7 @@ public class SendTask implements Runnable{
             data = formatter.format(LocalDateTime.now());
 
             writeFile("no reply", false, out);
-            writeFile(from, false, out);
+            writeFile(user.getUserEmail(), false, out);
             writeFile("Indirizzi email errati", false, out);
             writeFile(data, false, out);
             writeFile("Nella mail con oggetto \""+object+"\", iseguenti indirizzi email sono errati: \n\n"+wrongAddress+"\n\nN:B:: si prega di non rispondere a questa email.", true, out);

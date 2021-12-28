@@ -11,7 +11,7 @@ import java.util.Vector;
 
 public class EmailWriter {
 
-    public String serverSendEmail(StringProperty emailAddress, String receivers, String object, String text){
+    public String serverSendEmail(User user /*StringProperty emailAddress*/, String receivers, String object, String text){
 
         String response;
 
@@ -26,12 +26,14 @@ public class EmailWriter {
 
                 Vector<String> operationRequest = new Vector<>();
                 operationRequest.add("send");
-                operationRequest.add(emailAddress.get());
+                //operationRequest.add(emailAddress.get());
                 operationRequest.add(receivers);
                 operationRequest.add(object);
                 operationRequest.add(text);
 
                 outStream.writeObject(operationRequest);
+
+                outStream.writeObject(user);
 
                 response = (String) inStream.readObject();
 

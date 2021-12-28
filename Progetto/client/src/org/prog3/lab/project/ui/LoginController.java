@@ -12,9 +12,12 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import org.prog3.lab.project.model.EmailClient;
 import org.prog3.lab.project.model.Login;
+import org.prog3.lab.project.model.User;
 
 
 public class LoginController {
+    private User user;
+
     @FXML
     private TextField fieldEmail;
 
@@ -51,7 +54,8 @@ public class LoginController {
             String access = model.searchUser(fieldEmail.getText(), fieldPassword.getText());
             //System.out.println(access);
             if (access.equals("accept")) {
-                loadEmailClient();
+                user = model.getUser();
+                loadEmailClient(user);
             } else if (access.equals("denied")) {
                 labelResult.setStyle("-fx-text-fill:RED");
                 labelResult.setText("Email o password errati. Riprovare!");
@@ -71,13 +75,13 @@ public class LoginController {
 
 
 
-    public void loadEmailClient() {
+    public void loadEmailClient(User user) {
         try{
             FXMLLoader loaderEmailClient = new FXMLLoader(getClass().getResource("../resources/emailClient.fxml"));
             Scene scene = new Scene(loaderEmailClient.load());
             EmailClientController emailClientController = loaderEmailClient.getController();
             EmailClient model = new EmailClient(fieldEmail.getText());
-            emailClientController.initialize(model, stage);
+            emailClientController.initialize(model, user, stage);
             stage.setTitle("Email client");
             stage.setScene(scene);
             stage.setMinWidth(950);

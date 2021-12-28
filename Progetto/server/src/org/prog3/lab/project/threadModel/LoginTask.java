@@ -1,5 +1,7 @@
 package org.prog3.lab.project.threadModel;
 
+import org.prog3.lab.project.model.User;
+
 import java.io.*;
 
 public class LoginTask implements Runnable{
@@ -16,21 +18,27 @@ public class LoginTask implements Runnable{
     }
 
     public void run(){
-
+        User user = null;
         String response = "denied";
+        boolean find = false;
 
         try {
             BufferedReader reader = new BufferedReader(new FileReader(filePath));
 
             String line = reader.readLine();
 
-            while (line != null && response.equals("denied")) {
-                if (line.compareTo(email + "-" + password) == 0)
+            while (line != null && !find) {
+                if (line.compareTo(email + "-" + password) == 0) {
+                    user = new User(email);
                     response = "accept";
+                    find=true;
+                }
+
                 line = reader.readLine();
             }
 
-            //System.out.println(response);
+            outStream.writeObject(user);
+
             outStream.writeObject(response);
 
         }catch (IOException e){

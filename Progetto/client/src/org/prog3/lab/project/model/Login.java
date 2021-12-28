@@ -9,6 +9,8 @@ import java.util.Vector;
 
 public class Login {
 
+    User user;
+
     public String searchUser(String userEmail, String userPassword) {
 
         String response = "denied";
@@ -30,6 +32,8 @@ public class Login {
 
                 outStream.writeObject(operationRequest);
 
+                user = (User) inStream.readObject();
+
                 response = (String) inStream.readObject();
 
                 return response;
@@ -43,5 +47,9 @@ public class Login {
         }
 
         return response;
+    }
+
+    public User getUser(){
+        return user;
     }
 }

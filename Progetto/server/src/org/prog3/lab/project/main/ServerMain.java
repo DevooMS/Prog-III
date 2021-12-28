@@ -1,5 +1,6 @@
 package org.prog3.lab.project.main;
 
+import org.prog3.lab.project.model.User;
 import org.prog3.lab.project.threadModel.*;
 
 import java.io.*;
@@ -42,6 +43,8 @@ public class ServerMain extends Thread {
                     ObjectOutputStream outStream = new ObjectOutputStream(incoming.getOutputStream());
                     ObjectInputStream inStream = new ObjectInputStream(incoming.getInputStream());
 
+                    User user = null;
+
                     Vector<String> v = null;
 
                     try {
@@ -64,19 +67,35 @@ public class ServerMain extends Thread {
                             loginThreads.execute(loginTask);
                             break;
                         case "update":
-                            path = "./server/src/org/prog3/lab/project/resources/userClients/"+v.get(1)+"/"+v.get(2);
-                            Runnable updateTask = new UpdateTask(path, Boolean.parseBoolean(v.get(3)), outStream);
+                            //path = "./server/src/org/prog3/lab/project/resources/userClients/"+v.get(1)+"/"+v.get(2);
+                            try {
+                                user = (User) inStream.readObject();
+                            } catch (ClassNotFoundException e) {
+                                System.out.println(e.getMessage());
+                            }
+                            path = "./server/src/org/prog3/lab/project/resources/userClients/"+user.getUserEmail()+"/"+v.get(1);
+                            Runnable updateTask = new UpdateTask(user, path, Boolean.parseBoolean(v.get(2)), outStream);
                             //System.out.println(v.get(3));
                             updateThreads.execute(updateTask);
                             break;
                         case "send":
-                            path = "./server/src/org/prog3/lab/project/resources/userClients/"+v.get(1)+"/sendedEmails/";
-                            Runnable sendTask = new SendTask(path, v.get(1), v.get(2), v.get(3), v.get(4), outStream);
+                            try {
+                                user = (User) inStream.readObject();
+                            } catch (ClassNotFoundException e) {
+                                System.out.println(e.getMessage());
+                            }
+                            path = "./server/src/org/prog3/lab/project/resources/userClients/"+user.getUserEmail()+"/sendedEmails/";
+                            Runnable sendTask = new SendTask(path, user, v.get(1), v.get(2), v.get(3), outStream);
                             sendThreads.execute(sendTask);
                             break;
                         case "remove":
-                            path = "./server/src/org/prog3/lab/project/resources/userClients/"+v.get(1)+"/"+v.get(2)+"/"+v.get(3);
-                            Runnable removeTask = new RemoveTask(path);
+                            try {
+                                user = (User) inStream.readObject();
+                            } catch (ClassNotFoundException e) {
+                                System.out.println(e.getMessage());
+                            }
+                            path = "./server/src/org/prog3/lab/project/resources/userClients/"+user.getUserEmail()+"/"+v.get(1)+"/"+v.get(2);
+                            Runnable removeTask = new RemoveTask(user, path);
                             removeThreads.execute(removeTask);
                             break;
                         case "terminate":
@@ -90,6 +109,7 @@ public class ServerMain extends Thread {
                             sendThreads.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
                             removeThreads.shutdown();
                             removeThreads.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
+                            break;
                         default:
                             new IOException();
                             break;

@@ -37,8 +37,8 @@ public class EmailClient {
         return emailAddress;
     }
 
-    public void deleteEmail(Email email) {
-        serverRemoveEmail(email.getType(), email.getId());
+    public void deleteEmail(User user, Email email) {
+        serverRemoveEmail(user, email.getType(), email.getId());
 
         if(email.getType().equals("receivedEmails"))
             listReceivedEmails.remove(email);
@@ -46,20 +46,20 @@ public class EmailClient {
             listSendedEmails.remove(email);
     }
 
-    public int updateEmailslists(boolean updateSended, boolean startUpdate){
+    public int updateEmailslists(User user, boolean updateSended, boolean startUpdate){
 
         int countNewEmails;
 
         if(updateSended)
-            serverRequestUpdateList(listSendedEmails, "sendedEmails", startUpdate);
+            serverRequestUpdateList(user, listSendedEmails, "sendedEmails", startUpdate);
 
-        countNewEmails = serverRequestUpdateList(listReceivedEmails, "receivedEmails", startUpdate);
+        countNewEmails = serverRequestUpdateList(user, listReceivedEmails, "receivedEmails", startUpdate);
 
         return countNewEmails;
 
     }
 
-    private int serverRequestUpdateList(ObservableList list, String mailType, boolean startUpdate){
+    private int serverRequestUpdateList(User user, ObservableList list, String mailType, boolean startUpdate){
 
         int countEmails = 0;
 
@@ -74,11 +74,13 @@ public class EmailClient {
 
                 Vector<String> operationRequest = new Vector<>();
                 operationRequest.add("update");
-                operationRequest.add(emailAddressProperty().get());
+                //operationRequest.add(emailAddressProperty().get());
                 operationRequest.add(mailType);
                 operationRequest.add(String.valueOf(startUpdate));
 
                 outStream.writeObject(operationRequest);
+
+                outStream.writeObject(user);
 
                 countEmails = (Integer) inStream.readObject();
 
@@ -122,7 +124,7 @@ public class EmailClient {
 
     }
 
-    private void serverRemoveEmail(String emailType, String emailId){
+    private void serverRemoveEmail(User user, String emailType, String emailId){
 
         try {
             Socket s = new Socket(InetAddress.getLocalHost().getHostName(), 8190);
@@ -133,11 +135,13 @@ public class EmailClient {
 
                 Vector<String> operationRequest = new Vector<>();
                 operationRequest.add("remove");
-                operationRequest.add(emailAddressProperty().get());
+                //operationRequest.add(emailAddressProperty().get());
                 operationRequest.add(emailType);
                 operationRequest.add(emailId);
 
                 outStream.writeObject(operationRequest);
+
+                outStream.writeObject(user);
 
             }finally{
                 s.close();

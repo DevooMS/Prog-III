@@ -22,6 +22,7 @@ import javafx.util.Duration;
 import org.prog3.lab.project.model.Email;
 import org.prog3.lab.project.model.EmailClient;
 import org.prog3.lab.project.model.EmailWriter;
+import org.prog3.lab.project.model.User;
 
 public class EmailClientController {
 
@@ -83,17 +84,19 @@ public class EmailClientController {
     private Tab tabSendedEmails;
 
     private EmailClient model;
+    private User user;
     private Stage stage;
     private static Email selectEmail;
     private Email emptyEmail;
     private boolean activate = false;
 
     @FXML
-    public void initialize(EmailClient model, Stage stage){
+    public void initialize(EmailClient model, User user, Stage stage){
         if (this.model != null)
             throw new IllegalStateException("Model can only be initialized once");
 
         this.model =model;
+        this.user = user;
         this.stage = stage;
         //istanza nuovo client
         //model.generateRandomEmails(10);
@@ -111,7 +114,7 @@ public class EmailClientController {
         btnNewEmail.setOnAction(this::btnNewEmailClick);
         btnDelete.setOnAction(this::btnDeleteClick);
         btnUpdate.setOnAction(this::updateEmailsLists);
-        tabReceivedEmails.setOnSelectionChanged(this::updateEmailsLists);
+        //tabReceivedEmails.setOnSelectionChanged(this::updateEmailsLists);
 
         emptyEmail = new Email("", "","", "", "", "", "");
 
@@ -138,7 +141,7 @@ public class EmailClientController {
     }
 
     private void showEmails(boolean updateSended, boolean startUpdate){
-        int countNewEmails = model.updateEmailslists(updateSended, startUpdate );
+        int countNewEmails = model.updateEmailslists(user, updateSended, startUpdate );
 
         if(countNewEmails > 0) {
             labelError.setVisible(false);
@@ -225,21 +228,20 @@ public class EmailClientController {
             Stage writeStage = new Stage();
             EmailWriterController emailWriterController = loaderEmailWriter.getController();
             EmailWriter modelWriter = new EmailWriter();
-            emailWriterController.initialize(modelWriter, model, writeStage, this.model.emailAddressProperty(), to, object, text);
+            emailWriterController.initialize(modelWriter, /*model,*/ writeStage, user /*this.model.emailAddressProperty()*/, to, object, text);
             writeStage.initModality(Modality.APPLICATION_MODAL);
             writeStage.setScene(scene);
             writeStage.setMinWidth(650);
             writeStage.setMinHeight(500);
             writeStage.setResizable(false);
+            writeStage.show();
 
-            writeStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            writeStage.setOnCloseRequest( new EventHandler<WindowEvent>() {
                 @Override
                 public void handle(WindowEvent windowEvent) {
                     showEmails(true, false);
                 }
             });
-
-            writeStage.show();
 
         }catch (Exception e){
             System.out.println("Exception: "+ e.getMessage());
@@ -249,13 +251,14 @@ public class EmailClientController {
 
     protected void btnDeleteClick(ActionEvent actionEvent){
 
-        if(tabReceivedEmails.isSelected()){
+        /*if(tabReceivedEmails.isSelected()){
             model.deleteEmail(selectEmail);
         }
         if(tabSendedEmails.isSelected()){
             model.deleteEmail(selectEmail);
-        }
+        }*/
 
+        model.deleteEmail(user, selectEmail);
 
         viewEmailDetail(emptyEmail);
     }
