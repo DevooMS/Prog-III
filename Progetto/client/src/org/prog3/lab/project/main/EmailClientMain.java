@@ -4,7 +4,6 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.prog3.lab.project.model.Login;
 import org.prog3.lab.project.ui.LoginController;
 
 public class EmailClientMain extends Application {
@@ -16,8 +15,8 @@ public class EmailClientMain extends Application {
         Scene scene = new Scene(loaderLogin.load());
 
         LoginController loginController = loaderLogin.getController();
-        Login model = new Login();                                             //model una nuova instanza del model package login
-        loginController.initialize(model, stage);
+        //Login model = new Login();                                             //model una nuova instanza del model package login
+        loginController.initialize(/*model,*/ stage);
         stage.setTitle("User Login");
         stage.setScene(scene);
         stage.setMinWidth(300);

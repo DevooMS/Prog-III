@@ -9,6 +9,7 @@ import java.net.Socket;
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 public class ServerMain extends Thread {
@@ -21,15 +22,18 @@ public class ServerMain extends Thread {
         Thread t = new Thread(st);
         t.start();
 
-        ServerOperation ();
+        Semaphore serverSemaphore = new Semaphore(10);
+
+        ServerOperation (serverSemaphore);
 
     }
 
-    private static void ServerOperation(){
+    private static void ServerOperation(Semaphore serverSemaphore){
 
         try {
             ServerSocket s = new ServerSocket(8190);
             ExecutorService loginThreads = Executors.newFixedThreadPool(NUM_THREAD);
+            ExecutorService logoutThreads = Executors.newFixedThreadPool(NUM_THREAD);
             ExecutorService updateThreads = Executors.newFixedThreadPool(NUM_THREAD);
             ExecutorService sendThreads = Executors.newFixedThreadPool(NUM_THREAD);
             ExecutorService removeThreads = Executors.newFixedThreadPool(NUM_THREAD);
@@ -63,8 +67,17 @@ public class ServerMain extends Thread {
                     switch (operation) {
                         case "login":
                             path = "./server/src/org/prog3/lab/project/resources/userEmails.txt";
-                            Runnable loginTask = new LoginTask(v.get(1), v.get(2), path, outStream);
+                            Runnable loginTask = new LoginTask(v.get(1), v.get(2), serverSemaphore, path, outStream);
                             loginThreads.execute(loginTask);
+                            break;
+                        case "logout":
+                            try {
+                                user = (User) inStream.readObject();
+                            } catch (ClassNotFoundException e) {
+                                System.out.println(e.getMessage());
+                            }
+                            Runnable logoutTask = new LogoutTask(user, serverSemaphore);
+                            logoutThreads.execute(logoutTask);
                             break;
                         case "update":
                             //path = "./server/src/org/prog3/lab/project/resources/userClients/"+v.get(1)+"/"+v.get(2);

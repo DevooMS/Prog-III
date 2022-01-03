@@ -1,12 +1,10 @@
 package org.prog3.lab.project.ui;
 
-import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
-import org.prog3.lab.project.model.EmailClient;
 import org.prog3.lab.project.model.EmailWriter;
 import org.prog3.lab.project.model.User;
 

@@ -153,4 +153,28 @@ public class EmailClient {
 
     }
 
+    public void serverLogout(User user){
+        try {
+            Socket s = new Socket(InetAddress.getLocalHost().getHostName(), 8190);
+
+            try {
+
+                ObjectOutputStream outStream = new ObjectOutputStream(s.getOutputStream());
+
+                Vector<String> operationRequest = new Vector<>();
+                operationRequest.add("logout");
+
+                outStream.writeObject(operationRequest);
+
+                outStream.writeObject(user);
+
+            }finally{
+                s.close();
+            }
+
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+
 }

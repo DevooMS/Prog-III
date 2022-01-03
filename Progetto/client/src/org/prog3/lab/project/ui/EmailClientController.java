@@ -130,6 +130,7 @@ public class EmailClientController {
             @Override
             public void handle(WindowEvent windowEvent) {
                 timeline.stop();
+                model.serverLogout(user);
             }
         });
     }

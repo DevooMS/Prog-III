@@ -34,11 +34,11 @@ public class LoginController {
     private Stage stage;
 
     @FXML
-    public void initialize(Login model, Stage stage){
+    public void initialize(/*Login model,*/ Stage stage){
         if (this.model != null)
             throw new IllegalStateException("Model can only be initialized once");
 
-        this.model = model;
+        this.model = new Login();
         this.stage = stage;
 
         fieldEmail.setOnMouseClicked(this::userDataClick);
@@ -52,14 +52,17 @@ public class LoginController {
             labelResult.setStyle("-fx-text-fill:GREEN");
             labelResult.setText("Login incorso. Attendere...");
             String access = model.searchUser(fieldEmail.getText(), fieldPassword.getText());
-            //System.out.println(access);
+            //System.out.println(state);
             if (access.equals("accept")) {
                 user = model.getUser();
                 loadEmailClient(user);
             } else if (access.equals("denied")) {
                 labelResult.setStyle("-fx-text-fill:RED");
                 labelResult.setText("Email o password errati. Riprovare!");
-            } else {
+            } else if(access.equals("logged")) {
+                labelResult.setStyle("-fx-text-fill:RED");
+                labelResult.setText("Utente già loggato");
+            }else {
                 labelResult.setStyle("-fx-text-fill:RED");
                 labelResult.setText("Errore di connessione al server.");
             }

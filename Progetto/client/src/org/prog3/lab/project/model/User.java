@@ -5,10 +5,13 @@ import java.util.concurrent.Semaphore;
 
 public class User implements Serializable {
     private String userEmail;
+    private Semaphore connection;
+    private Semaphore access;
     private Semaphore readWrite;
 
     public User(String userEmail) {
         this.userEmail = userEmail;
+        this.connection = new Semaphore(1);
         this.readWrite = new Semaphore(1);
     }
 
@@ -18,5 +21,9 @@ public class User implements Serializable {
 
     public Semaphore getReadWrite() {
         return readWrite;
+    }
+
+    public Semaphore getConnection() {
+        return connection;
     }
 }

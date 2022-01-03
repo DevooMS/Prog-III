@@ -43,7 +43,7 @@ public class EmailWriter {
 
         } catch (IOException | ClassNotFoundException e){
             e.printStackTrace();
-            response ="Errore di comunicazione con il server.\nControllare le mail inviate prima di procedere con un nuovo invio.";
+            response ="Errore di comunicazione con il server.";
         }
 
         return response;
