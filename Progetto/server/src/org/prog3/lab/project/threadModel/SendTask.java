@@ -7,11 +7,16 @@ import java.nio.channels.FileChannel;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Semaphore;
 
 public class SendTask implements Runnable{
 
+    private Semaphore connectionSemaphore;
+    private Semaphore sendSemaphore;
+    private Semaphore receivedSemaphore;
+    private final ExecutorService logThreads;
     String path;
-    //String from;
     User user;
     String receivers;
     String object;
@@ -21,9 +26,12 @@ public class SendTask implements Runnable{
     private String wrongAddress = "";
     private File file_send;
 
-    public SendTask(String path, User user /*String from*/,  String receivers, String object, String text, ObjectOutputStream outStream) {
+    public SendTask(Semaphore connectionSemaphore, Semaphore sendSemaphore, Semaphore receivedSemaphore, ExecutorService logThreads, String path, User user, String receivers, String object, String text, ObjectOutputStream outStream) {
+        this.connectionSemaphore = connectionSemaphore;
+        this.sendSemaphore = sendSemaphore;
+        this.receivedSemaphore = receivedSemaphore;
+        this.logThreads = logThreads;
         this.path = path;
-        //this.from = from;
         this.user = user;
         this.receivers = receivers;
         this.object = object;
@@ -47,8 +55,6 @@ public class SendTask implements Runnable{
                 response = "Errore durante l'invio. Riprovare.";
 
             }else {
-
-                //if(checkAddress(receivers)){
 
                 checkAddress(receivers);
 
@@ -83,12 +89,15 @@ public class SendTask implements Runnable{
 
             outStream.close();
 
+            logThreads.execute(new LogTask(connectionSemaphore, "./server/src/org/prog3/lab/project/resources/log/connection/"+user.getUserEmail(), "send connection"));
+
+            logThreads.execute(new LogTask(sendSemaphore, "./server/src/org/prog3/lab/project/resources/log/send/"+user.getUserEmail(), "send"));
         } catch (IOException | InterruptedException e) {
 
             e.printStackTrace();
 
         }
-
+        System.out.println("send end");
     }
 
     private void checkAddress(String receivers){
@@ -152,6 +161,8 @@ public class SendTask implements Runnable{
 
             from.close();
             receiver.close();
+
+            logThreads.execute(new LogTask(receivedSemaphore, "./server/src/org/prog3/lab/project/resources/log/received/"+listReceivers.get(i), "received"));
         }
 
         if(wrongAddress.length() > 0){

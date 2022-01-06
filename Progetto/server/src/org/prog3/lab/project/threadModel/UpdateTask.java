@@ -4,15 +4,23 @@ package org.prog3.lab.project.threadModel;
 import org.prog3.lab.project.model.User;
 
 import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Semaphore;
 
 public class UpdateTask implements Runnable{
     private final User user;
+    private Semaphore connectionSemaphore;
+    private final ExecutorService logThreads;
     private final String directoryPath;
     private final boolean startUpdate;
     private final ObjectOutputStream outStream;
 
-    public UpdateTask(User user, String directoryPath, boolean startUpdate, ObjectOutputStream outStream){
+    public UpdateTask(User user, Semaphore connectionSemaphore, ExecutorService logThreads, String directoryPath, boolean startUpdate, ObjectOutputStream outStream){
         this.user = user;
+        this.connectionSemaphore = connectionSemaphore;
+        this.logThreads = logThreads;
         this.directoryPath = directoryPath;
         this.startUpdate = startUpdate;
         this.outStream = outStream;
@@ -123,6 +131,8 @@ public class UpdateTask implements Runnable{
             outStream.writeObject(countNoRead);
 
             outStream.close();
+
+            logThreads.execute(new LogTask(connectionSemaphore, "./server/src/org/prog3/lab/project/resources/log/connection/"+user.getUserEmail(), "update connection"));
 
         }catch (IOException | InterruptedException e) {
             e.printStackTrace();

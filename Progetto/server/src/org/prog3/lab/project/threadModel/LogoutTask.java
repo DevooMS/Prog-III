@@ -5,17 +5,22 @@ import org.prog3.lab.project.model.User;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Semaphore;
 
 public class LogoutTask implements Runnable{
 
     private final User user;
-    private final Semaphore serverSemaphore;
+    private Semaphore serverSemaphore;
+    private Semaphore connectionSemaphore;
+    private final ExecutorService logThreads;
     private String data;
 
-    public LogoutTask(User user, Semaphore serverSemaphore){
+    public LogoutTask(User user, Semaphore serverSemaphore, Semaphore connectionSemaphore, ExecutorService logThreads){
         this.user = user;
         this.serverSemaphore = serverSemaphore;
+        this.connectionSemaphore = connectionSemaphore;
+        this.logThreads = logThreads;
     }
 
     public void run(){
@@ -24,17 +29,18 @@ public class LogoutTask implements Runnable{
         data = formatter.format(LocalDateTime.now());
 
         try {
-            serverSemaphore.acquire();
-
             File fileAccess = new File("./server/src/org/prog3/lab/project/resources/log/access/"+user.getUserEmail());
             FileWriter fileAccessWriter = new FileWriter(fileAccess, true);
+
+            FileWriter fwState = new FileWriter("./server/src/org/prog3/lab/project/resources/log/state/"+user.getUserEmail());
+            BufferedWriter writeState = new BufferedWriter(fwState);
+
+            serverSemaphore.acquire();
 
             fileAccessWriter.write("logout - "+ data+"\n");
 
             fileAccessWriter.close();
 
-            FileWriter fwState = new FileWriter("./server/src/org/prog3/lab/project/resources/log/state/"+user.getUserEmail());
-            BufferedWriter writeState = new BufferedWriter(fwState);
             writeState.write("unlogged");
             writeState.flush();
             writeState.close();
@@ -45,21 +51,7 @@ public class LogoutTask implements Runnable{
             serverSemaphore.release();
         }
 
-        try{
-            user.getConnection().acquire();
+        logThreads.execute(new LogTask(connectionSemaphore, "./server/src/org/prog3/lab/project/resources/log/connection/"+user.getUserEmail(), "logout connection"));
 
-            File fileConnection = new File("./server/src/org/prog3/lab/project/resources/log/connection/"+user.getUserEmail());
-            FileWriter fileConnectionWriter = new FileWriter(fileConnection, true);
-
-            fileConnectionWriter.write("logout connection - "+ data+"\n");
-
-            fileConnectionWriter.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } finally{
-           user.getConnection().release();
-        }
     }
 }

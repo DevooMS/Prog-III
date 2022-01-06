@@ -6,19 +6,24 @@ import java.io.*;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Semaphore;
 
 public class LoginTask implements Runnable{
     private final String email;
     private final String password;
-    private final Semaphore serverSemaphore;
+    private Semaphore serverSemaphore;
+    private Semaphore connectionSemaphore;
+    private final ExecutorService logThreads;
     private final String filePath;
     private final ObjectOutputStream outStream;
 
-    public LoginTask(String email, String password, Semaphore serverSemaphore, String filePath, ObjectOutputStream outStream){
+    public LoginTask(String email, String password, Semaphore serverSemaphore, Semaphore connectionSemaphore, ExecutorService logThreads, String filePath, ObjectOutputStream outStream){
         this.email = email;
         this.password = password;
         this.serverSemaphore = serverSemaphore;
+        this.connectionSemaphore = connectionSemaphore;
+        this.logThreads = logThreads;
         this.filePath = filePath;
         this.outStream = outStream;
     }
@@ -42,15 +47,17 @@ public class LoginTask implements Runnable{
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
                     data = formatter.format(LocalDateTime.now());
 
+                    File fileAccess = new File("./server/src/org/prog3/lab/project/resources/log/access/"+email);
+                    FileWriter fileAccessWriter = new FileWriter(fileAccess, true);
+
                     try {
                         serverSemaphore.acquire();
 
                         String lineState = readerState.readLine();
 
-                        if(lineState.equals("unlogged")){
+                        readerState.close();
 
-                            File fileAccess = new File("./server/src/org/prog3/lab/project/resources/log/access/"+email);
-                            FileWriter fileAccessWriter = new FileWriter(fileAccess, true);
+                        if(lineState.equals("unlogged")){
 
                             fileAccessWriter.write("login - "+ data+"\n");
 
@@ -58,6 +65,7 @@ public class LoginTask implements Runnable{
 
                             FileWriter fwState = new FileWriter("./server/src/org/prog3/lab/project/resources/log/state/"+email);
                             BufferedWriter writeState = new BufferedWriter(fwState);
+
                             writeState.write("logged");
                             writeState.flush();
                             writeState.close();
@@ -72,24 +80,12 @@ public class LoginTask implements Runnable{
                     if(accept) {
                         user = new User(email);
 
-                        try {
-                            user.getConnection().acquire();
+                        logThreads.execute(new LogTask(connectionSemaphore, "./server/src/org/prog3/lab/project/resources/log/connection/"+user.getUserEmail(), "login connection"));
 
-                            File fileConnection = new File("./server/src/org/prog3/lab/project/resources/log/connection/"+email);
-                            FileWriter fileConnectionWriter = new FileWriter(fileConnection, true);
-
-                            fileConnectionWriter.write("login connection - "+ data+"\n");
-
-                            fileConnectionWriter.close();
-                        } finally{
-                            user.getConnection().release();;
-                        }
                         response = "accept";
                     } else {
                         response = "logged";
                     }
-
-                    readerState.close();
 
                     find = true;
                 }

@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ServerMain extends Thread {
 
-    private static final int NUM_THREAD = 5;
+    private static final int NUM_THREAD = 3;
 
     public static void main(String[] args) throws Exception {
 
@@ -22,13 +22,11 @@ public class ServerMain extends Thread {
         Thread t = new Thread(st);
         t.start();
 
-        Semaphore serverSemaphore = new Semaphore(10);
-
-        ServerOperation (serverSemaphore);
+        ServerOperation ();
 
     }
 
-    private static void ServerOperation(Semaphore serverSemaphore){
+    private static void ServerOperation(){
 
         try {
             ServerSocket s = new ServerSocket(8190);
@@ -37,6 +35,12 @@ public class ServerMain extends Thread {
             ExecutorService updateThreads = Executors.newFixedThreadPool(NUM_THREAD);
             ExecutorService sendThreads = Executors.newFixedThreadPool(NUM_THREAD);
             ExecutorService removeThreads = Executors.newFixedThreadPool(NUM_THREAD);
+            ExecutorService logThreads = Executors.newFixedThreadPool(NUM_THREAD);
+
+            Semaphore accessSemaphore = new Semaphore(1);
+            Semaphore connectionSemaphore = new Semaphore(1);
+            Semaphore sendSemaphore = new Semaphore(1);
+            Semaphore receivedSemaphore = new Semaphore(1);
 
             try{
                 boolean accept = true;
@@ -67,7 +71,7 @@ public class ServerMain extends Thread {
                     switch (operation) {
                         case "login":
                             path = "./server/src/org/prog3/lab/project/resources/userEmails.txt";
-                            Runnable loginTask = new LoginTask(v.get(1), v.get(2), serverSemaphore, path, outStream);
+                            Runnable loginTask = new LoginTask(v.get(1), v.get(2), accessSemaphore, connectionSemaphore, logThreads,  path, outStream);
                             loginThreads.execute(loginTask);
                             break;
                         case "logout":
@@ -76,7 +80,7 @@ public class ServerMain extends Thread {
                             } catch (ClassNotFoundException e) {
                                 System.out.println(e.getMessage());
                             }
-                            Runnable logoutTask = new LogoutTask(user, serverSemaphore);
+                            Runnable logoutTask = new LogoutTask(user, accessSemaphore, connectionSemaphore, logThreads);
                             logoutThreads.execute(logoutTask);
                             break;
                         case "update":
@@ -87,7 +91,7 @@ public class ServerMain extends Thread {
                                 System.out.println(e.getMessage());
                             }
                             path = "./server/src/org/prog3/lab/project/resources/userClients/"+user.getUserEmail()+"/"+v.get(1);
-                            Runnable updateTask = new UpdateTask(user, path, Boolean.parseBoolean(v.get(2)), outStream);
+                            Runnable updateTask = new UpdateTask(user, connectionSemaphore, logThreads, path, Boolean.parseBoolean(v.get(2)), outStream);
                             //System.out.println(v.get(3));
                             updateThreads.execute(updateTask);
                             break;
@@ -98,7 +102,7 @@ public class ServerMain extends Thread {
                                 System.out.println(e.getMessage());
                             }
                             path = "./server/src/org/prog3/lab/project/resources/userClients/"+user.getUserEmail()+"/sendedEmails/";
-                            Runnable sendTask = new SendTask(path, user, v.get(1), v.get(2), v.get(3), outStream);
+                            Runnable sendTask = new SendTask(connectionSemaphore, sendSemaphore, receivedSemaphore, logThreads, path, user, v.get(1), v.get(2), v.get(3), outStream);
                             sendThreads.execute(sendTask);
                             break;
                         case "remove":
@@ -108,7 +112,7 @@ public class ServerMain extends Thread {
                                 System.out.println(e.getMessage());
                             }
                             path = "./server/src/org/prog3/lab/project/resources/userClients/"+user.getUserEmail()+"/"+v.get(1)+"/"+v.get(2);
-                            Runnable removeTask = new RemoveTask(user, path);
+                            Runnable removeTask = new RemoveTask(user, connectionSemaphore, logThreads, path);
                             removeThreads.execute(removeTask);
                             break;
                         case "terminate":
@@ -122,6 +126,10 @@ public class ServerMain extends Thread {
                             sendThreads.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
                             removeThreads.shutdown();
                             removeThreads.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
+                            logoutThreads.shutdown();
+                            logoutThreads.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
+                            logThreads.shutdown();
+                            logThreads.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
                             break;
                         default:
                             new IOException();
