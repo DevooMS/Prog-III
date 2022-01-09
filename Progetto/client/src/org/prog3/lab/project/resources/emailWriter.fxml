@@ -40,12 +40,12 @@
       </TextArea>
       <Button fx:id="btnSend" mnemonicParsing="false" prefHeight="34.0" prefWidth="63.0" text="Invia" StackPane.alignment="BOTTOM_CENTER">
          <StackPane.margin>
-            <Insets bottom="15.0" />
+            <Insets bottom="7.5" />
          </StackPane.margin>
       </Button>
-      <Label fx:id="sendResult" minHeight="-Infinity" visible="false" StackPane.alignment="BOTTOM_CENTER">
+      <Label fx:id="labelSendResult" visible="false" StackPane.alignment="BOTTOM_CENTER">
          <StackPane.margin>
-            <Insets bottom="20.0" />
+            <Insets bottom="42.5" />
          </StackPane.margin>
       </Label>
    </children>

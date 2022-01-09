@@ -37,21 +37,25 @@ public class EmailClient {
         return emailAddress;
     }
 
-    public void deleteEmail(User user, Email email) {
-        serverRemoveEmail(user, email.getType(), email.getId());
+    public boolean deleteEmail(User user, Email email) {
+        boolean result = serverRemoveEmail(user, email.getType(), email.getId());
 
-        if(email.getType().equals("receivedEmails"))
-            listReceivedEmails.remove(email);
-        else
-            listSendedEmails.remove(email);
+        if(result) {
+            if (email.getType().equals("receivedEmails"))
+                listReceivedEmails.remove(email);
+            else
+                listSendedEmails.remove(email);
+        }
+
+        return result;
     }
 
-    public int updateEmailslists(User user, boolean updateSended, boolean startUpdate){
+    public int updateEmailslists(User user, boolean updateSended, boolean startUpdate) {
 
         int countNewEmails;
 
-        if(updateSended)
-            serverRequestUpdateList(user, listSendedEmails, "sendedEmails", startUpdate);
+        if (updateSended)
+            countNewEmails = serverRequestUpdateList(user, listSendedEmails, "sendedEmails", startUpdate);
 
         countNewEmails = serverRequestUpdateList(user, listReceivedEmails, "receivedEmails", startUpdate);
 
@@ -118,13 +122,16 @@ public class EmailClient {
 
         } catch (IOException | ClassNotFoundException e){
             e.printStackTrace();
+            countEmails = -1;
         }
 
         return countEmails;
 
     }
 
-    private void serverRemoveEmail(User user, String emailType, String emailId){
+    private boolean serverRemoveEmail(User user, String emailType, String emailId){
+
+        boolean result;
 
         try {
             Socket s = new Socket(InetAddress.getLocalHost().getHostName(), 8190);
@@ -143,14 +150,17 @@ public class EmailClient {
 
                 outStream.writeObject(user);
 
+                result = true;
             }finally{
                 s.close();
             }
 
-        } catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
-        }
 
+            result = false;
+        }
+        return result;
     }
 
     public void serverLogout(User user){
@@ -176,5 +186,4 @@ public class EmailClient {
             e.printStackTrace();
         }
     }
-
 }

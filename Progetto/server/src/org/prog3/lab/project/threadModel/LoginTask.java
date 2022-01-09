@@ -12,16 +12,16 @@ import java.util.concurrent.Semaphore;
 public class LoginTask implements Runnable{
     private final String email;
     private final String password;
-    private Semaphore serverSemaphore;
+    private Semaphore accessSemaphore;
     private Semaphore connectionSemaphore;
     private final ExecutorService logThreads;
     private final String filePath;
     private final ObjectOutputStream outStream;
 
-    public LoginTask(String email, String password, Semaphore serverSemaphore, Semaphore connectionSemaphore, ExecutorService logThreads, String filePath, ObjectOutputStream outStream){
+    public LoginTask(String email, String password, Semaphore accessSemaphore, Semaphore connectionSemaphore, ExecutorService logThreads, String filePath, ObjectOutputStream outStream){
         this.email = email;
         this.password = password;
-        this.serverSemaphore = serverSemaphore;
+        this.accessSemaphore = accessSemaphore;
         this.connectionSemaphore = connectionSemaphore;
         this.logThreads = logThreads;
         this.filePath = filePath;
@@ -31,9 +31,7 @@ public class LoginTask implements Runnable{
     public void run(){
         User user = null;
         String response = "denied";
-        String data = null;
         boolean find = false;
-        boolean accept = false;
 
         try {
             BufferedReader reader = new BufferedReader(new FileReader(filePath));
@@ -42,50 +40,14 @@ public class LoginTask implements Runnable{
 
             while (line != null && !find) {
                 if (line.compareTo(email + "-" + password) == 0) {
-                    BufferedReader readerState = new BufferedReader(new FileReader("./server/src/org/prog3/lab/project/resources/log/state/"+email));
 
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
-                    data = formatter.format(LocalDateTime.now());
+                    logThreads.execute(new LogTask(accessSemaphore, "./server/src/org/prog3/lab/project/resources/log/access/"+email, "login"));
 
-                    File fileAccess = new File("./server/src/org/prog3/lab/project/resources/log/access/"+email);
-                    FileWriter fileAccessWriter = new FileWriter(fileAccess, true);
+                    user = new User(email);
 
-                    try {
-                        serverSemaphore.acquire();
+                    logThreads.execute(new LogTask(connectionSemaphore, "./server/src/org/prog3/lab/project/resources/log/connection/"+user.getUserEmail(), "login connection"));
 
-                        String lineState = readerState.readLine();
-
-                        readerState.close();
-
-                        if(lineState.equals("unlogged")){
-
-                            fileAccessWriter.write("login - "+ data+"\n");
-
-                            fileAccessWriter.close();
-
-                            FileWriter fwState = new FileWriter("./server/src/org/prog3/lab/project/resources/log/state/"+email);
-                            BufferedWriter writeState = new BufferedWriter(fwState);
-
-                            writeState.write("logged");
-                            writeState.flush();
-                            writeState.close();
-                            fwState.close();
-
-                            accept = true;
-                        }
-                    } finally{
-                        serverSemaphore.release();
-                    }
-
-                    if(accept) {
-                        user = new User(email);
-
-                        logThreads.execute(new LogTask(connectionSemaphore, "./server/src/org/prog3/lab/project/resources/log/connection/"+user.getUserEmail(), "login connection"));
-
-                        response = "accept";
-                    } else {
-                        response = "logged";
-                    }
+                    response = "accept";
 
                     find = true;
                 }
@@ -97,7 +59,7 @@ public class LoginTask implements Runnable{
 
             outStream.writeObject(response);
 
-        }catch (IOException | InterruptedException e){
+        }catch (IOException e){
             e.printStackTrace();
         }
     }

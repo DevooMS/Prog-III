@@ -52,8 +52,8 @@ public class SendTask implements Runnable{
 
             if(file_send.exists()){
 
-                response = "Errore durante l'invio. Riprovare.";
-
+                //response = "Errore durante l'invio. Riprovare.";
+                response = "send_error";
             }else {
 
                 checkAddress(receivers);
@@ -81,7 +81,8 @@ public class SendTask implements Runnable{
 
                 sendToReceivers();
 
-                response = "Email inviata correttamente.";
+                //response = "Email inviata correttamente.";
+                response = "send_correct";
 
             }
 
@@ -97,7 +98,6 @@ public class SendTask implements Runnable{
             e.printStackTrace();
 
         }
-        System.out.println("send end");
     }
 
     private void checkAddress(String receivers){

@@ -27,6 +27,9 @@ import org.prog3.lab.project.model.User;
 public class EmailClientController {
 
     @FXML
+    private Label labelConnectionError;
+
+    @FXML
     private Label labelAccountName;
 
     @FXML
@@ -144,8 +147,15 @@ public class EmailClientController {
     private void showEmails(boolean updateSended, boolean startUpdate){
         int countNewEmails = model.updateEmailslists(user, updateSended, startUpdate );
 
-        if(countNewEmails > 0) {
-            labelError.setVisible(false);
+        if(countNewEmails < 0) {
+            labelConnectionError.setVisible(true);
+            labelAccountName.setVisible(false);
+        } else if(countNewEmails==0){
+            labelConnectionError.setVisible(false);
+            labelAccountName.setVisible(true);
+        } else if(countNewEmails > 0) {
+            labelConnectionError.setVisible(false);
+            labelAccountName.setVisible(true);
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setHeaderText(null);
             alert.setTitle("Nuove email ricevute");
@@ -252,16 +262,16 @@ public class EmailClientController {
 
     protected void btnDeleteClick(ActionEvent actionEvent){
 
-        /*if(tabReceivedEmails.isSelected()){
-            model.deleteEmail(selectEmail);
+        boolean result = model.deleteEmail(user, selectEmail);
+
+        if(result) {
+            viewEmailDetail(emptyEmail);
+            labelConnectionError.setVisible(false);
+            labelAccountName.setVisible(true);
+        }else{
+            labelConnectionError.setVisible(true);
+            labelAccountName.setVisible(false);
         }
-        if(tabSendedEmails.isSelected()){
-            model.deleteEmail(selectEmail);
-        }*/
-
-        model.deleteEmail(user, selectEmail);
-
-        viewEmailDetail(emptyEmail);
     }
 
     protected void viewEmailDetail(Email email) {

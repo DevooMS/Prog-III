@@ -29,7 +29,7 @@ public class EmailWriterController {
     private Button btnSend;
 
     @FXML
-    private Label sendResult;
+    private Label labelSendResult;
 
 
     private EmailWriter modelWriter;
@@ -67,9 +67,20 @@ public class EmailWriterController {
     private void btnSendClick(ActionEvent actionEvent) {
         String response = modelWriter.serverSendEmail(user/*emailAddress*/, textReceivers.getText(), textObject.getText(), textEmail.getText());
 
-        btnSend.setVisible(false);
-        sendResult.setText(response);
-        sendResult.setVisible(true);
+        if(response.equals("send_error")){
+            labelSendResult.setText("Errore durante l'invio. Riprovare.");
+            labelSendResult.setStyle("-fx-text-fill: red");
+            labelSendResult.setVisible(true);
+        } else if(response.equals("server_error")){
+            labelSendResult.setText("Errore di comunicazione con il server. Riprovare.");
+            labelSendResult.setStyle("-fx-text-fill: red");
+            labelSendResult.setVisible(true);
+        } else if(response.equals("send_correct")){
+            labelSendResult.setText("Email inviata correttamente.");
+            labelSendResult.setStyle("-fx-text-fill: green");
+            labelSendResult.setVisible(true);
+            btnSend.setDisable(true);
+        }
     }
 
     private void keyReleased(KeyEvent keyEvent) {

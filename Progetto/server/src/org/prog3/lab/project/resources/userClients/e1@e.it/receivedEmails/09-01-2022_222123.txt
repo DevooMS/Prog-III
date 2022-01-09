@@ -9,7 +9,7 @@ e1@e.it
 Indirizzi email errati
 --END--
 --START--
-06/01/2022 00:14:31
+09/01/2022 22:21:23
 --END--
 --START_TEXT--
 Nella mail con oggetto "", iseguenti indirizzi email sono errati: 

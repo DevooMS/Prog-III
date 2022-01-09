@@ -59,10 +59,7 @@ public class LoginController {
             } else if (access.equals("denied")) {
                 labelResult.setStyle("-fx-text-fill:RED");
                 labelResult.setText("Email o password errati. Riprovare!");
-            } else if(access.equals("logged")) {
-                labelResult.setStyle("-fx-text-fill:RED");
-                labelResult.setText("Utente già loggato");
-            }else {
+            } else {
                 labelResult.setStyle("-fx-text-fill:RED");
                 labelResult.setText("Errore di connessione al server.");
             }

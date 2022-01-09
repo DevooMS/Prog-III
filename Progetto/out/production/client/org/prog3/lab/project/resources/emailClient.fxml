@@ -24,6 +24,14 @@
                <children>
                   <StackPane minWidth="-Infinity" prefHeight="599.2" prefWidth="450.4" AnchorPane.bottomAnchor="430.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
+                        <Label fx:id="labelConnectionError" text="Errore di connessione con il server" textFill="#f00000" visible="false" StackPane.alignment="TOP_CENTER">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                           <StackPane.margin>
+                              <Insets top="10.0" />
+                           </StackPane.margin>
+                        </Label>
                         <Label fx:id="labelAccountName" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="453.0" text="Nome di prova" textAlignment="CENTER" AnchorPane.bottomAnchor="430.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" StackPane.alignment="TOP_CENTER">
                            <font>
                               <Font name="Arial" size="18.0" />
