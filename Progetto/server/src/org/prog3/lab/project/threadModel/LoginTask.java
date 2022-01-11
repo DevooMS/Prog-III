@@ -12,16 +12,16 @@ import java.util.concurrent.Semaphore;
 public class LoginTask implements Runnable{
     private final String email;
     private final String password;
-    private Semaphore accessSemaphore;
+    private Semaphore loginSemaphore;
     private Semaphore connectionSemaphore;
     private final ExecutorService logThreads;
     private final String filePath;
     private final ObjectOutputStream outStream;
 
-    public LoginTask(String email, String password, Semaphore accessSemaphore, Semaphore connectionSemaphore, ExecutorService logThreads, String filePath, ObjectOutputStream outStream){
+    public LoginTask(String email, String password, Semaphore loginSemaphore, Semaphore connectionSemaphore, ExecutorService logThreads, String filePath, ObjectOutputStream outStream){
         this.email = email;
         this.password = password;
-        this.accessSemaphore = accessSemaphore;
+        this.loginSemaphore = loginSemaphore;
         this.connectionSemaphore = connectionSemaphore;
         this.logThreads = logThreads;
         this.filePath = filePath;
@@ -41,7 +41,7 @@ public class LoginTask implements Runnable{
             while (line != null && !find) {
                 if (line.compareTo(email + "-" + password) == 0) {
 
-                    logThreads.execute(new LogTask(accessSemaphore, "./server/src/org/prog3/lab/project/resources/log/access/"+email, "login"));
+                    logThreads.execute(new LogTask(loginSemaphore, "./server/src/org/prog3/lab/project/resources/log/login/"+email, "login"));
 
                     user = new User(email);
 

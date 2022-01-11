@@ -37,7 +37,8 @@ public class ServerMain extends Thread {
             ExecutorService removeThreads = Executors.newFixedThreadPool(NUM_THREAD);
             ExecutorService logThreads = Executors.newFixedThreadPool(NUM_THREAD);
 
-            Semaphore accessSemaphore = new Semaphore(1);
+            Semaphore loginSemaphore = new Semaphore(1);
+            Semaphore logoutSemaphore = new Semaphore(1);
             Semaphore connectionSemaphore = new Semaphore(1);
             Semaphore sendSemaphore = new Semaphore(1);
             Semaphore receivedSemaphore = new Semaphore(1);
@@ -71,7 +72,7 @@ public class ServerMain extends Thread {
                     switch (operation) {
                         case "login":
                             path = "./server/src/org/prog3/lab/project/resources/userEmails.txt";
-                            Runnable loginTask = new LoginTask(v.get(1), v.get(2), accessSemaphore, connectionSemaphore, logThreads,  path, outStream);
+                            Runnable loginTask = new LoginTask(v.get(1), v.get(2), loginSemaphore, connectionSemaphore, logThreads,  path, outStream);
                             loginThreads.execute(loginTask);
                             break;
                         case "logout":
@@ -80,7 +81,7 @@ public class ServerMain extends Thread {
                             } catch (ClassNotFoundException e) {
                                 System.out.println(e.getMessage());
                             }
-                            Runnable logoutTask = new LogoutTask(user, accessSemaphore, connectionSemaphore, logThreads);
+                            Runnable logoutTask = new LogoutTask(user, logoutSemaphore, connectionSemaphore, logThreads);
                             logoutThreads.execute(logoutTask);
                             break;
                         case "update":

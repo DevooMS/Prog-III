@@ -24,7 +24,7 @@ public class LogoutTask implements Runnable{
 
     public void run(){
 
-        logThreads.execute(new LogTask(accessSemaphore, "./server/src/org/prog3/lab/project/resources/log/access/"+user.getUserEmail(), "logout"));
+        logThreads.execute(new LogTask(accessSemaphore, "./server/src/org/prog3/lab/project/resources/log/logout/"+user.getUserEmail(), "logout"));
 
         logThreads.execute(new LogTask(connectionSemaphore, "./server/src/org/prog3/lab/project/resources/log/connection/"+user.getUserEmail(), "logout connection"));
 

@@ -6,7 +6,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import org.prog3.lab.project.model.User;
+import org.prog3.lab.project.ui.LoginController;
+import org.prog3.lab.project.ui.ServerController;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
@@ -30,7 +35,8 @@ public class ServerThread extends Application implements Runnable {
             e.printStackTrace();
         }
 
-        //ServerController loaderController = loaderServerPanel.getController();
+        ServerController serverController = loaderServerPanel.getController();
+        serverController.initialize(stage);
         stage.setTitle("main page");
         stage.setScene(scene);
         stage.setMinWidth(741);
@@ -57,5 +63,7 @@ public class ServerThread extends Application implements Runnable {
                 }
             }
         });
+
+
     }
 }

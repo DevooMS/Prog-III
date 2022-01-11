@@ -32,7 +32,7 @@ public class LogTask implements Runnable{
             try {
                 sem.acquire();
 
-                fileConnectionWriter.write(operation+" - " + data + "\n");
+                fileConnectionWriter.write(operation+"-" + data + "\n");
 
             } finally {
                 sem.release();
