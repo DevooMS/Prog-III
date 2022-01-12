@@ -12,9 +12,9 @@ import java.util.concurrent.Semaphore;
 
 public class SendTask implements Runnable{
 
-    private Semaphore connectionSemaphore;
-    private Semaphore sendSemaphore;
-    private Semaphore receivedSemaphore;
+    private Semaphore connectionSem;
+    private Semaphore sendSem;
+    private Semaphore receivedSem;
     private final ExecutorService logThreads;
     String path;
     User user;
@@ -26,10 +26,10 @@ public class SendTask implements Runnable{
     private String wrongAddress = "";
     private File file_send;
 
-    public SendTask(Semaphore connectionSemaphore, Semaphore sendSemaphore, Semaphore receivedSemaphore, ExecutorService logThreads, String path, User user, String receivers, String object, String text, ObjectOutputStream outStream) {
-        this.connectionSemaphore = connectionSemaphore;
-        this.sendSemaphore = sendSemaphore;
-        this.receivedSemaphore = receivedSemaphore;
+    public SendTask(Semaphore connectionSem, Semaphore sendSem, Semaphore receivedSem, ExecutorService logThreads, String path, User user, String receivers, String object, String text, ObjectOutputStream outStream) {
+        this.connectionSem = connectionSem;
+        this.sendSem = sendSem;
+        this.receivedSem = receivedSem;
         this.logThreads = logThreads;
         this.path = path;
         this.user = user;
@@ -90,9 +90,9 @@ public class SendTask implements Runnable{
 
             outStream.close();
 
-            logThreads.execute(new LogTask(connectionSemaphore, "./server/src/org/prog3/lab/project/resources/log/connection/"+user.getUserEmail(), "send connection"));
+            logThreads.execute(new LogTask(connectionSem, "./server/src/org/prog3/lab/project/resources/log/connection/"+user.getUserEmail(), "send connection"));
 
-            logThreads.execute(new LogTask(sendSemaphore, "./server/src/org/prog3/lab/project/resources/log/send/"+user.getUserEmail(), "send"));
+            logThreads.execute(new LogTask(sendSem, "./server/src/org/prog3/lab/project/resources/log/send/"+user.getUserEmail(), "send"));
         } catch (IOException | InterruptedException e) {
 
             e.printStackTrace();
@@ -162,7 +162,7 @@ public class SendTask implements Runnable{
             from.close();
             receiver.close();
 
-            logThreads.execute(new LogTask(receivedSemaphore, "./server/src/org/prog3/lab/project/resources/log/received/"+listReceivers.get(i), "received"));
+            logThreads.execute(new LogTask(receivedSem, "./server/src/org/prog3/lab/project/resources/log/received/"+listReceivers.get(i), "received"));
         }
 
         if(wrongAddress.length() > 0){

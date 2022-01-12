@@ -1,0 +1,25 @@
+--READ--
+--START--
+no reply
+--END--
+--START--
+e1@e.it
+--END--
+--START--
+Indirizzi email errati
+--END--
+--START--
+12/01/2022 23:51:58
+--END--
+--START_TEXT--
+Nella mail con oggetto "", iseguenti indirizzi email sono errati: 
+
+
+e1@e.it
+
+
+
+
+N:B:: si prega di non rispondere a questa email.
+
+--END_TEXT--

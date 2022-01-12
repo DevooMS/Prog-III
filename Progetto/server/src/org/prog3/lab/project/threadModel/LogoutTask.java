@@ -11,22 +11,22 @@ import java.util.concurrent.Semaphore;
 public class LogoutTask implements Runnable{
 
     private final User user;
-    private Semaphore accessSemaphore;
-    private Semaphore connectionSemaphore;
+    private Semaphore accessSem;
+    private Semaphore connectionSem;
     private final ExecutorService logThreads;
 
-    public LogoutTask(User user, Semaphore accessSemaphore, Semaphore connectionSemaphore, ExecutorService logThreads){
+    public LogoutTask(User user, Semaphore accessSem, Semaphore connectionSem, ExecutorService logThreads){
         this.user = user;
-        this.accessSemaphore = accessSemaphore;
-        this.connectionSemaphore = connectionSemaphore;
+        this.accessSem= accessSem;
+        this.connectionSem = connectionSem;
         this.logThreads = logThreads;
     }
 
     public void run(){
 
-        logThreads.execute(new LogTask(accessSemaphore, "./server/src/org/prog3/lab/project/resources/log/logout/"+user.getUserEmail(), "logout"));
+        logThreads.execute(new LogTask(accessSem, "./server/src/org/prog3/lab/project/resources/log/logout/"+user.getUserEmail(), "logout"));
 
-        logThreads.execute(new LogTask(connectionSemaphore, "./server/src/org/prog3/lab/project/resources/log/connection/"+user.getUserEmail(), "logout connection"));
+        logThreads.execute(new LogTask(connectionSem, "./server/src/org/prog3/lab/project/resources/log/connection/"+user.getUserEmail(), "logout connection"));
 
     }
 }

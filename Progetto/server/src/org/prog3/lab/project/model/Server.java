@@ -10,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.concurrent.Semaphore;
 
 public class Server {
     private final ObservableList<String> listClients;
@@ -82,24 +83,78 @@ public class Server {
         }
     }
 
-    public boolean showLogConnection(String user){
-        return showLog(listConnection, "./server/src/org/prog3/lab/project/resources/log/connection/"+user);
+    public boolean showLogConnection(String user, Semaphore connectionSem){
+        boolean ris = false;
+        try {
+            connectionSem.acquire();
+            ris =  showLog(listConnection, "./server/src/org/prog3/lab/project/resources/log/connection/" + user);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            connectionSem.release();
+        }
+
+        return ris;
     }
 
-    public boolean showLogSend(String user){
-        return showLog(listSend, "./server/src/org/prog3/lab/project/resources/log/send/"+user);
+    public boolean showLogSend(String user, Semaphore sendSem){
+        boolean ris = false;
+
+        try{
+            sendSem.acquire();
+            ris = showLog(listSend, "./server/src/org/prog3/lab/project/resources/log/send/"+user);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            sendSem.release();
+        }
+
+        return ris;
     }
 
-    public boolean showLogReceived(String user){
-        return showLog(listReceived, "./server/src/org/prog3/lab/project/resources/log/received/"+user);
+    public boolean showLogReceived(String user, Semaphore receivedSem){
+        boolean ris = false;
+
+        try{
+            receivedSem.acquire();
+            ris = showLog(listReceived, "./server/src/org/prog3/lab/project/resources/log/received/"+user);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            receivedSem.release();
+        }
+
+        return ris;
     }
 
-    public boolean showLogLogin(String user){
-        return showLog(listLogin,"./server/src/org/prog3/lab/project/resources/log/login/"+user);
+    public boolean showLogLogin(String user, Semaphore loginSem){
+        boolean ris = false;
+
+        try{
+            loginSem.acquire();
+            ris = showLog(listLogin,"./server/src/org/prog3/lab/project/resources/log/login/"+user);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            loginSem.release();
+        }
+
+        return ris;
     }
 
-    public boolean showLogLogout(String user){
-        return showLog(listLogout,"./server/src/org/prog3/lab/project/resources/log/logout/"+user);
+    public boolean showLogLogout(String user, Semaphore logoutSem){
+        boolean ris = false;
+
+        try{
+            logoutSem.acquire();
+            ris = showLog(listLogout,"./server/src/org/prog3/lab/project/resources/log/logout/"+user);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            logoutSem.release();
+        }
+
+        return ris;
     }
 
     private boolean showLog(ObservableList<String> list, String filePath){

@@ -12,13 +12,13 @@ import java.util.concurrent.Semaphore;
 public class RemoveTask implements Runnable {
 
     private User user;
-    private Semaphore connectionSemaphore;
+    private Semaphore connectionSem;
     private final ExecutorService logThreads;
     private String path;
 
-    public RemoveTask(User user, Semaphore conncectionSemaphore, ExecutorService logThreads, String path) {
+    public RemoveTask(User user, Semaphore conncectionSem, ExecutorService logThreads, String path) {
         this.user = user;
-        this.connectionSemaphore = conncectionSemaphore;
+        this.connectionSem = conncectionSem;
         this.logThreads = logThreads;
         this.path = path;
     }
@@ -33,7 +33,7 @@ public class RemoveTask implements Runnable {
 
             user.getReadWrite().release();
 
-            logThreads.execute(new LogTask(connectionSemaphore, "./server/src/org/prog3/lab/project/resources/log/connection/"+user.getUserEmail(), "remove connection"));
+            logThreads.execute(new LogTask(connectionSem, "./server/src/org/prog3/lab/project/resources/log/connection/"+user.getUserEmail(), "remove connection"));
         }catch(Exception e){
             System.out.println(e.getMessage());
         }

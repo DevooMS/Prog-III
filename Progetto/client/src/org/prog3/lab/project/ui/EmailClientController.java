@@ -123,7 +123,7 @@ public class EmailClientController {
 
         viewEmailDetail(emptyEmail);
 
-        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(32), ev -> {
+        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(30), ev -> {
             showEmails(false, false);
         }));
         timeline.setCycleCount(Timeline.INDEFINITE);

@@ -11,15 +11,15 @@ import java.util.concurrent.Semaphore;
 
 public class UpdateTask implements Runnable{
     private final User user;
-    private Semaphore connectionSemaphore;
+    private Semaphore connectionSem;
     private final ExecutorService logThreads;
     private final String directoryPath;
     private final boolean startUpdate;
     private final ObjectOutputStream outStream;
 
-    public UpdateTask(User user, Semaphore connectionSemaphore, ExecutorService logThreads, String directoryPath, boolean startUpdate, ObjectOutputStream outStream){
+    public UpdateTask(User user, Semaphore connectionSem, ExecutorService logThreads, String directoryPath, boolean startUpdate, ObjectOutputStream outStream){
         this.user = user;
-        this.connectionSemaphore = connectionSemaphore;
+        this.connectionSem = connectionSem;
         this.logThreads = logThreads;
         this.directoryPath = directoryPath;
         this.startUpdate = startUpdate;
@@ -132,7 +132,7 @@ public class UpdateTask implements Runnable{
 
             outStream.close();
 
-            logThreads.execute(new LogTask(connectionSemaphore, "./server/src/org/prog3/lab/project/resources/log/connection/"+user.getUserEmail(), "update connection"));
+            logThreads.execute(new LogTask(connectionSem, "./server/src/org/prog3/lab/project/resources/log/connection/"+user.getUserEmail(), "update connection"));
 
         }catch (IOException | InterruptedException e) {
             e.printStackTrace();

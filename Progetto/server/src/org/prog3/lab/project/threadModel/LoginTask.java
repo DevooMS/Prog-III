@@ -12,17 +12,17 @@ import java.util.concurrent.Semaphore;
 public class LoginTask implements Runnable{
     private final String email;
     private final String password;
-    private Semaphore loginSemaphore;
-    private Semaphore connectionSemaphore;
+    private Semaphore loginSem;
+    private Semaphore connectionSem;
     private final ExecutorService logThreads;
     private final String filePath;
     private final ObjectOutputStream outStream;
 
-    public LoginTask(String email, String password, Semaphore loginSemaphore, Semaphore connectionSemaphore, ExecutorService logThreads, String filePath, ObjectOutputStream outStream){
+    public LoginTask(String email, String password, Semaphore loginSem, Semaphore connectionSem, ExecutorService logThreads, String filePath, ObjectOutputStream outStream){
         this.email = email;
         this.password = password;
-        this.loginSemaphore = loginSemaphore;
-        this.connectionSemaphore = connectionSemaphore;
+        this.loginSem = loginSem;
+        this.connectionSem = connectionSem;
         this.logThreads = logThreads;
         this.filePath = filePath;
         this.outStream = outStream;
@@ -41,11 +41,11 @@ public class LoginTask implements Runnable{
             while (line != null && !find) {
                 if (line.compareTo(email + "-" + password) == 0) {
 
-                    logThreads.execute(new LogTask(loginSemaphore, "./server/src/org/prog3/lab/project/resources/log/login/"+email, "login"));
+                    logThreads.execute(new LogTask(loginSem, "./server/src/org/prog3/lab/project/resources/log/login/"+email, "login"));
 
                     user = new User(email);
 
-                    logThreads.execute(new LogTask(connectionSemaphore, "./server/src/org/prog3/lab/project/resources/log/connection/"+user.getUserEmail(), "login connection"));
+                    logThreads.execute(new LogTask(connectionSem, "./server/src/org/prog3/lab/project/resources/log/connection/"+user.getUserEmail(), "login connection"));
 
                     response = "accept";
 

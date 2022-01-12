@@ -1,9 +1,17 @@
 package org.prog3.lab.project.main;
 
+import javafx.application.Application;
+import javafx.event.EventHandler;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import org.prog3.lab.project.model.User;
 import org.prog3.lab.project.threadModel.*;
+import org.prog3.lab.project.ui.ServerController;
 
 import java.io.*;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Vector;
@@ -12,139 +20,41 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-public class ServerMain extends Thread {
+public class ServerMain extends Application {
 
     private static final int NUM_THREAD = 3;
+    static Semaphore loginSem = new Semaphore(1);
+    static Semaphore logoutSem = new Semaphore(1);
+    static Semaphore connectionSem = new Semaphore(1);
+    static Semaphore sendSem = new Semaphore(1);
+    static Semaphore receivedSem = new Semaphore(1);
 
     public static void main(String[] args) throws Exception {
 
-        ServerThread st = new ServerThread();
+        ServerThread st = new ServerThread(loginSem, logoutSem, connectionSem, sendSem, receivedSem);
         Thread t = new Thread(st);
         t.start();
 
-        ServerOperation ();
-
+        launch();
     }
 
-    private static void ServerOperation(){
-
+    @Override
+    public void start(Stage stage) {
+        FXMLLoader loaderServerPanel = new FXMLLoader(getClass().getResource("../ui/panelAdmin.fxml"));
+        Scene scene = null;
         try {
-            ServerSocket s = new ServerSocket(8190);
-            ExecutorService loginThreads = Executors.newFixedThreadPool(NUM_THREAD);
-            ExecutorService logoutThreads = Executors.newFixedThreadPool(NUM_THREAD);
-            ExecutorService updateThreads = Executors.newFixedThreadPool(NUM_THREAD);
-            ExecutorService sendThreads = Executors.newFixedThreadPool(NUM_THREAD);
-            ExecutorService removeThreads = Executors.newFixedThreadPool(NUM_THREAD);
-            ExecutorService logThreads = Executors.newFixedThreadPool(NUM_THREAD);
-
-            Semaphore loginSemaphore = new Semaphore(1);
-            Semaphore logoutSemaphore = new Semaphore(1);
-            Semaphore connectionSemaphore = new Semaphore(1);
-            Semaphore sendSemaphore = new Semaphore(1);
-            Semaphore receivedSemaphore = new Semaphore(1);
-
-            try{
-                boolean accept = true;
-
-                while(accept) {
-                    Socket incoming = s.accept();
-
-                    ObjectOutputStream outStream = new ObjectOutputStream(incoming.getOutputStream());
-                    ObjectInputStream inStream = new ObjectInputStream(incoming.getInputStream());
-
-                    User user = null;
-
-                    Vector<String> v = null;
-
-                    try {
-                        v = ((Vector<String>) inStream.readObject());
-                    } catch (ClassNotFoundException e) {
-                        System.out.println(e.getMessage());
-                    }
-
-                    String operation = null;
-
-                    if (v != null)
-                        operation = v.get(0);
-
-                    String path;
-
-                    switch (operation) {
-                        case "login":
-                            path = "./server/src/org/prog3/lab/project/resources/userEmails.txt";
-                            Runnable loginTask = new LoginTask(v.get(1), v.get(2), loginSemaphore, connectionSemaphore, logThreads,  path, outStream);
-                            loginThreads.execute(loginTask);
-                            break;
-                        case "logout":
-                            try {
-                                user = (User) inStream.readObject();
-                            } catch (ClassNotFoundException e) {
-                                System.out.println(e.getMessage());
-                            }
-                            Runnable logoutTask = new LogoutTask(user, logoutSemaphore, connectionSemaphore, logThreads);
-                            logoutThreads.execute(logoutTask);
-                            break;
-                        case "update":
-                            //path = "./server/src/org/prog3/lab/project/resources/userClients/"+v.get(1)+"/"+v.get(2);
-                            try {
-                                user = (User) inStream.readObject();
-                            } catch (ClassNotFoundException e) {
-                                System.out.println(e.getMessage());
-                            }
-                            path = "./server/src/org/prog3/lab/project/resources/userClients/"+user.getUserEmail()+"/"+v.get(1);
-                            Runnable updateTask = new UpdateTask(user, connectionSemaphore, logThreads, path, Boolean.parseBoolean(v.get(2)), outStream);
-                            //System.out.println(v.get(3));
-                            updateThreads.execute(updateTask);
-                            break;
-                        case "send":
-                            try {
-                                user = (User) inStream.readObject();
-                            } catch (ClassNotFoundException e) {
-                                System.out.println(e.getMessage());
-                            }
-                            path = "./server/src/org/prog3/lab/project/resources/userClients/"+user.getUserEmail()+"/sendedEmails/";
-                            Runnable sendTask = new SendTask(connectionSemaphore, sendSemaphore, receivedSemaphore, logThreads, path, user, v.get(1), v.get(2), v.get(3), outStream);
-                            sendThreads.execute(sendTask);
-                            break;
-                        case "remove":
-                            try {
-                                user = (User) inStream.readObject();
-                            } catch (ClassNotFoundException e) {
-                                System.out.println(e.getMessage());
-                            }
-                            path = "./server/src/org/prog3/lab/project/resources/userClients/"+user.getUserEmail()+"/"+v.get(1)+"/"+v.get(2);
-                            Runnable removeTask = new RemoveTask(user, connectionSemaphore, logThreads, path);
-                            removeThreads.execute(removeTask);
-                            break;
-                        case "terminate":
-                            accept=false;
-                            //s.close();
-                            loginThreads.shutdown();
-                            loginThreads.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
-                            updateThreads.shutdown();
-                            updateThreads.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
-                            sendThreads.shutdown();
-                            sendThreads.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
-                            removeThreads.shutdown();
-                            removeThreads.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
-                            logoutThreads.shutdown();
-                            logoutThreads.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
-                            logThreads.shutdown();
-                            logThreads.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
-                            break;
-                        default:
-                            new IOException();
-                            break;
-                    }
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } finally {
-                s.close();
-            }
+            scene = new Scene(loaderServerPanel.load());
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
 
+        ServerController serverController = loaderServerPanel.getController();
+        serverController.initialize(stage, loginSem, logoutSem, connectionSem, sendSem, receivedSem);
+        stage.setTitle("main page");
+        stage.setScene(scene);
+        stage.setMinWidth(741);
+        stage.setMinHeight(535);
+        stage.setResizable(false);
+        stage.show();
+    }
 }
