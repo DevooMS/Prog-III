@@ -17,28 +17,28 @@ public class Login {
 
         try {
 
-            Socket s = new Socket(InetAddress.getLocalHost().getHostName(), 8190);
+            Socket s = new Socket(InetAddress.getLocalHost().getHostName(), 8190);          //apro un scoket con la porta 8190
 
             try {
 
-                ObjectOutputStream outStream = new ObjectOutputStream(s.getOutputStream());
+                ObjectOutputStream outStream = new ObjectOutputStream(s.getOutputStream());      //faccio un oggetto di outStream
 
-                ObjectInputStream inStream = new ObjectInputStream(s.getInputStream());
+                ObjectInputStream inStream = new ObjectInputStream(s.getInputStream());          //faccio un oggetto di inputStream
 
-                Vector<String> operationRequest = new Vector<>();
-                operationRequest.add("login");
-                operationRequest.add(userEmail);
-                operationRequest.add(userPassword);
+                Vector<String> operationRequest = new Vector<>();                                //creo un array Vector
+                operationRequest.add("login");                                                   //aggiungo un request di tipo string login
+                operationRequest.add(userEmail);                                                 //aggiungo un request di tipo string userEmail
+                operationRequest.add(userPassword);                                              //aggiungo un request di tipo string userPassword
 
-                outStream.writeObject(operationRequest);
+                outStream.writeObject(operationRequest);                                         //invio questo vector sul outStream
 
-                user = (User) inStream.readObject();
+                user = (User) inStream.readObject();                                             //assegno oggetto al user di inputstream
 
-                response = (String) inStream.readObject();
+                response = (String) inStream.readObject();                                       //prendo la stringa di response
 
                 return response;
             }finally{
-                s.close();
+                s.close();                                                                        //chiudi il socket
             }
 
         } catch (IOException | ClassNotFoundException e){

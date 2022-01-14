@@ -11,15 +11,15 @@ public class EmailClientMain extends Application {
     @Override
     public void start(Stage stage) throws Exception {
 
-        FXMLLoader loaderLogin = new FXMLLoader(getClass().getResource("../resources/login.fxml"));
-        Scene scene = new Scene(loaderLogin.load());
+        FXMLLoader loaderLogin = new FXMLLoader(getClass().getResource("../resources/login.fxml"));  //carico fxml
+        Scene scene = new Scene(loaderLogin.load());                                                       //creo nuova scena
 
         LoginController loginController = loaderLogin.getController();
         //Login model = new Login();                                             //model una nuova instanza del model package login
-        loginController.initialize(/*model,*/ stage);
+        loginController.initialize(/*model,*/ stage);                            //faccio il stage
         stage.setTitle("User Login");
         stage.setScene(scene);
-        stage.setMinWidth(300);
+        stage.setMinWidth(300);                                                  //grandezza della scena
         stage.setMinHeight(300);
         stage.setResizable(false);
         stage.show();

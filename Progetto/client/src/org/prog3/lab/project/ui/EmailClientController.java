@@ -106,10 +106,10 @@ public class EmailClientController {
         showEmails(true, true);  //inizio partendo con update della lista inviate
 
         //binding tra lstEmails e inboxProperty
-        labelAccountName.textProperty().bind(model.emailAddressProperty());
-        listReceivedEmails.itemsProperty().bind(model.receivedEmailsProperty());
-        listReceivedEmails.setOnMouseClicked(this::showSelectReceivedEmail);    //this prende il metodo showselectRecivedEmail e gli passa mouse event
-        listSendedEmails.itemsProperty().bind(model.sendedEmailsProperty());
+        labelAccountName.textProperty().bind(model.emailAddressProperty());          //prendo il labelAcc.. E accedo al textProperty e faccio il bind al nostro property|| ogno volta che si modifica model mi modifica anche listReceiv e modifica in tempo reale il view di questo label
+        listReceivedEmails.itemsProperty().bind(model.receivedEmailsProperty());     //stessa cosa per le listReceivedEmails il bind cambia i dati la view cambia quando i dati sono cambiati
+        listReceivedEmails.setOnMouseClicked(this::showSelectReceivedEmail);         //chiamo la funzione showSelectRecivedEmail alla presione del mouse
+        listSendedEmails.itemsProperty().bind(model.sendedEmailsProperty());          
         listSendedEmails.setOnMouseClicked(this::showSelectSendedEmail);
         btnReply.setOnAction(this::btnReplyClick);
         btnReplyAll.setOnAction(this::btnReplyAllClick);
@@ -119,9 +119,9 @@ public class EmailClientController {
         btnUpdate.setOnAction(this::updateEmailsLists);
         //tabReceivedEmails.setOnSelectionChanged(this::updateEmailsLists);
 
-        emptyEmail = new Email("", "","", "", "", "", "");
+        emptyEmail = new Email("", "","", "", "", "", "");   //parto con il view vuoto
 
-        viewEmailDetail(emptyEmail);
+        viewEmailDetail(emptyEmail);                                                                //chiamo il metodo viewEmailDetail prende l'email e cambia i componenti grafici
 
         Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(30), ev -> {
             showEmails(false, false);
@@ -265,7 +265,7 @@ public class EmailClientController {
         boolean result = model.deleteEmail(user, selectEmail);
 
         if(result) {
-            viewEmailDetail(emptyEmail);
+            viewEmailDetail(emptyEmail);                                                //chiamo il metodo viewEmailDetail prende l'email e cambia i componenti grafici
             labelConnectionError.setVisible(false);
             labelAccountName.setVisible(true);
         }else{
@@ -283,4 +283,3 @@ public class EmailClientController {
             textEmail.setText(email.getText());
         }
     }
-}

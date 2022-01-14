@@ -13,20 +13,20 @@ import java.net.Socket;
 import java.util.*;
 
 public class EmailClient {
-    private final ObservableList<Email> listReceivedEmails;    //gli salvo dentro la lista di email da email.java
-    private final ObservableList<Email> listSendedEmails;
+    private final ObservableList<Email> listReceivedEmails;    //gli salvo dentro la lista di email da email.java utilizza Observer e Property per fare il bind
+    private final ObservableList<Email> listSendedEmails;      //e una colezione oservabile di Email
     private final ListProperty<Email> sendedEmailsProperty;
     private final ListProperty<Email> receivedEmailsProperty;
     private final StringProperty emailAddress;
 
     public EmailClient(String emailAddress){
-        this.listReceivedEmails = FXCollections.observableArrayList();
-        this.listSendedEmails = FXCollections.observableArrayList();
-        this.receivedEmailsProperty = new SimpleListProperty<>();
-        this.receivedEmailsProperty.set(listReceivedEmails);             //gli sto associando il suo observer cioe ListrecivedEmails
+        this.listReceivedEmails = FXCollections.observableArrayList();      //creo un Observable List
+        this.listSendedEmails = FXCollections.observableArrayList();        //creo un Observable List
+        this.receivedEmailsProperty = new SimpleListProperty<>();           //creo un SimpleList
+        this.receivedEmailsProperty.set(listReceivedEmails);                //PropertyList dentro quale ho un Observable List
         this.sendedEmailsProperty = new SimpleListProperty<>();
         this.sendedEmailsProperty.set(listSendedEmails);
-        this.emailAddress = new SimpleStringProperty(emailAddress);
+        this.emailAddress = new SimpleStringProperty(emailAddress);          //crea un Property di tipo string
     }
 
     public ListProperty<Email> receivedEmailsProperty(){ return receivedEmailsProperty;}
@@ -42,7 +42,7 @@ public class EmailClient {
 
         if(result) {
             if (email.getType().equals("receivedEmails"))
-                listReceivedEmails.remove(email);
+                listReceivedEmails.remove(email);           //aggisco su ObservabeList e rimuovo email passato come parametro
             else
                 listSendedEmails.remove(email);
         }
