@@ -53,5 +53,4 @@ public class Email {
     public String toString() {
         return this.sender + " - " + this.date + "\n" + this.object;
     }
-
 }

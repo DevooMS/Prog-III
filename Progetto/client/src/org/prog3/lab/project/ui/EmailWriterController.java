@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
+import org.prog3.lab.project.model.EmailClient;
 import org.prog3.lab.project.model.EmailWriter;
 import org.prog3.lab.project.model.User;
 
@@ -39,14 +40,12 @@ public class EmailWriterController {
     private Stage writeStage;
 
     @FXML
-    public void initialize(EmailWriter modelWriter, /*EmailClient modelClient,*/ Stage writeStage, User user/*StringProperty emailAddress*/, String to, String object, String text){
+    public void initialize(Stage writeStage, User user, String to, String object, String text){
         if (this.modelWriter != null)
             throw new IllegalStateException("Model can only be initialized once");
 
-        this.modelWriter = modelWriter;
-        //this.modelClient = modelClient;
+        this.modelWriter = new EmailWriter();
         this.writeStage = writeStage;
-        //this.emailAddress = emailAddress;
         this.user = user;
 
         if(to!=null && object!=null && text!=null){

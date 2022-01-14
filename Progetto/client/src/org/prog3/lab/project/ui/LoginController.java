@@ -34,11 +34,11 @@ public class LoginController {
     private Stage stage;
 
     @FXML
-    public void initialize(/*Login model,*/ Stage stage){  //stage chiamato dal main
+    public void initialize(Stage stage){  //stage chiamato dal main
         if (this.model != null)                            //verifico se il modello che sto cercando di inizializzare sia diverso da null
             throw new IllegalStateException("Model can only be initialized once");
 
-        this.model = new Login();
+        this.model = new Login();                          //model una nuova instanza del model package login
         this.stage = stage;
 
         fieldEmail.setOnMouseClicked(this::userDataClick);                        //lancio il metodo userDataclick quando faccio click su fieldemail
@@ -52,7 +52,6 @@ public class LoginController {
             labelResult.setStyle("-fx-text-fill:GREEN");                           //imposto il colore Green per setText
             labelResult.setText("Login incorso. Attendere...");
             String access = model.searchUser(fieldEmail.getText(), fieldPassword.getText());      //chiamo il model del searchUser che si trova in Login.java
-            //System.out.println(state);
             if (access.equals("accept")) {                                                         //acesso garantito chiamo LoadEmailClient
                 user = model.getUser();
                 loadEmailClient(user);

@@ -1,4 +1,4 @@
---READ--
+--NO_READ--
 --START--
 e1@e.it
 --END--
@@ -6,13 +6,11 @@ e1@e.it
 e2@e.it
 --END--
 --START--
-
+ciao
 --END--
 --START--
-06/01/2022 23:12:37
+14/01/2022 22:56:52
 --END--
 --START_TEXT--
-
-
-
+ciao
 --END_TEXT--

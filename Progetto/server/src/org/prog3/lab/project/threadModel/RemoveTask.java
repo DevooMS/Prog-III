@@ -24,6 +24,8 @@ public class RemoveTask implements Runnable {
     }
 
     public void run(){
+        logThreads.execute(new LogTask(connectionSem, "./server/src/org/prog3/lab/project/resources/log/connection/"+user.getUserEmail(), "open remove connection"));
+
         try {
             user.getReadWrite().acquire();
 
@@ -31,11 +33,11 @@ public class RemoveTask implements Runnable {
 
             file_remove.delete();
 
-            user.getReadWrite().release();
-
-            logThreads.execute(new LogTask(connectionSem, "./server/src/org/prog3/lab/project/resources/log/connection/"+user.getUserEmail(), "remove connection"));
-        }catch(Exception e){
+            logThreads.execute(new LogTask(connectionSem, "./server/src/org/prog3/lab/project/resources/log/connection/"+user.getUserEmail(), "close remove connection"));
+        } catch(Exception e){
             System.out.println(e.getMessage());
+        } finally {
+            user.getReadWrite().release();
         }
 
     }

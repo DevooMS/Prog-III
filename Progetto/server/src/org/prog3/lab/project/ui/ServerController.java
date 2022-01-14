@@ -133,16 +133,18 @@ public class ServerController {
         tabLog.setVisible(true);
     }
 
-    private void updateLogForType(){
-        logConnection((String) listClients.getSelectionModel().getSelectedItem(), connectionSem);
+    private void updateLogForType() {
+        if (listClients.getSelectionModel().getSelectedItem() != null){
+            logConnection((String) listClients.getSelectionModel().getSelectedItem(), connectionSem);
 
-        logSend((String) listClients.getSelectionModel().getSelectedItem(), sendSem);
+            logSend((String) listClients.getSelectionModel().getSelectedItem(), sendSem);
 
-        logReceived((String) listClients.getSelectionModel().getSelectedItem(), receivedSem);
+            logReceived((String) listClients.getSelectionModel().getSelectedItem(), receivedSem);
 
-        logLogin((String) listClients.getSelectionModel().getSelectedItem(), loginSem);
+            logLogin((String) listClients.getSelectionModel().getSelectedItem(), loginSem);
 
-        logLogout((String) listClients.getSelectionModel().getSelectedItem(), logoutSem);
+            logLogout((String) listClients.getSelectionModel().getSelectedItem(), logoutSem);
+        }
     }
 
     private void logConnection(String item, Semaphore connectionSem){

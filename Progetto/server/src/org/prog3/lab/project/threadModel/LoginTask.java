@@ -45,7 +45,7 @@ public class LoginTask implements Runnable{
 
                     user = new User(email);
 
-                    logThreads.execute(new LogTask(connectionSem, "./server/src/org/prog3/lab/project/resources/log/connection/"+user.getUserEmail(), "login connection"));
+                    logThreads.execute(new LogTask(connectionSem, "./server/src/org/prog3/lab/project/resources/log/connection/"+user.getUserEmail(), "open login connection"));
 
                     response = "accept";
 
@@ -59,6 +59,7 @@ public class LoginTask implements Runnable{
 
             outStream.writeObject(response);
 
+            logThreads.execute(new LogTask(connectionSem, "./server/src/org/prog3/lab/project/resources/log/connection/"+user.getUserEmail(), "close login connection"));
         }catch (IOException e){
             e.printStackTrace();
         }

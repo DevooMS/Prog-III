@@ -1,6 +1,8 @@
 package org.prog3.lab.project.model;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.Semaphore;
 
 public class User implements Serializable {
@@ -19,5 +21,4 @@ public class User implements Serializable {
     public Semaphore getReadWrite() {
         return readWrite;
     }
-
 }

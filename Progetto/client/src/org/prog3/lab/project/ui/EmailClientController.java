@@ -94,11 +94,11 @@ public class EmailClientController {
     private boolean activate = false;
 
     @FXML
-    public void initialize(EmailClient model, User user, Stage stage){
+    public void initialize(EmailClient model, User user, Stage stage) {
         if (this.model != null)
             throw new IllegalStateException("Model can only be initialized once");
 
-        this.model =model;
+        this.model = model;
         this.user = user;
         this.stage = stage;
         //istanza nuovo client
@@ -109,7 +109,7 @@ public class EmailClientController {
         labelAccountName.textProperty().bind(model.emailAddressProperty());          //prendo il labelAcc.. E accedo al textProperty e faccio il bind al nostro property|| ogno volta che si modifica model mi modifica anche listReceiv e modifica in tempo reale il view di questo label
         listReceivedEmails.itemsProperty().bind(model.receivedEmailsProperty());     //stessa cosa per le listReceivedEmails il bind cambia i dati la view cambia quando i dati sono cambiati
         listReceivedEmails.setOnMouseClicked(this::showSelectReceivedEmail);         //chiamo la funzione showSelectRecivedEmail alla presione del mouse
-        listSendedEmails.itemsProperty().bind(model.sendedEmailsProperty());          
+        listSendedEmails.itemsProperty().bind(model.sendedEmailsProperty());
         listSendedEmails.setOnMouseClicked(this::showSelectSendedEmail);
         btnReply.setOnAction(this::btnReplyClick);
         btnReplyAll.setOnAction(this::btnReplyAllClick);
@@ -117,9 +117,9 @@ public class EmailClientController {
         btnNewEmail.setOnAction(this::btnNewEmailClick);
         btnDelete.setOnAction(this::btnDeleteClick);
         btnUpdate.setOnAction(this::updateEmailsLists);
-        //tabReceivedEmails.setOnSelectionChanged(this::updateEmailsLists);
+        tabReceivedEmails.setOnSelectionChanged(this::updateEmailsLists);
 
-        emptyEmail = new Email("", "","", "", "", "", "");   //parto con il view vuoto
+        emptyEmail = new Email("", "", "", "", "", "", "");   //parto con il view vuoto
 
         viewEmailDetail(emptyEmail);                                                                //chiamo il metodo viewEmailDetail prende l'email e cambia i componenti grafici
 
@@ -144,29 +144,29 @@ public class EmailClientController {
 
     }
 
-    private void showEmails(boolean updateSended, boolean startUpdate){
-        int countNewEmails = model.updateEmailslists(user, updateSended, startUpdate );
+    private void showEmails(boolean updateSended, boolean startUpdate) {
+        int countNewEmails = model.updateEmailslists(user, updateSended, startUpdate);
 
-        if(countNewEmails < 0) {
+        if (countNewEmails < 0) {
             labelConnectionError.setVisible(true);
             labelAccountName.setVisible(false);
-        } else if(countNewEmails==0){
+        } else if (countNewEmails == 0) {
             labelConnectionError.setVisible(false);
             labelAccountName.setVisible(true);
-        } else if(countNewEmails > 0) {
+        } else if (countNewEmails > 0) {
             labelConnectionError.setVisible(false);
             labelAccountName.setVisible(true);
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setHeaderText(null);
             alert.setTitle("Nuove email ricevute");
-            alert.setContentText("Hai ricevuto "+ countNewEmails + "email");
+            alert.setContentText("Hai ricevuto " + countNewEmails + "email");
             alert.show();
         }
     }
 
     protected void showSelectReceivedEmail(MouseEvent mouseEvent) {
 
-        if(!activate)
+        if (!activate)
             activeFiled();
 
         selectEmail = (Email) listReceivedEmails.getSelectionModel().getSelectedItem(); //casting ??
@@ -178,7 +178,7 @@ public class EmailClientController {
 
     protected void showSelectSendedEmail(MouseEvent mouseEvent) {
 
-        if(!activate)
+        if (!activate)
             activeFiled();
 
         selectEmail = (Email) listSendedEmails.getSelectionModel().getSelectedItem();
@@ -188,15 +188,15 @@ public class EmailClientController {
         viewEmailDetail(selectEmail);
     }
 
-    protected void btnShow(){
-        if(selectEmail.getType().equals("sendedEmails")){
-            if(!btnReply.isDisable() && !btnReplyAll.isDisable() && !btnForward.isDisable()){
+    protected void btnShow() {
+        if (selectEmail.getType().equals("sendedEmails")) {
+            if (!btnReply.isDisable() && !btnReplyAll.isDisable() && !btnForward.isDisable()) {
                 btnReply.setDisable(true);
                 btnReplyAll.setDisable(true);
                 btnForward.setDisable(true);
             }
-        } else{
-            if(btnReply.isDisable() && btnReplyAll.isDisable() && btnForward.isDisable()) {
+        } else {
+            if (btnReply.isDisable() && btnReplyAll.isDisable() && btnForward.isDisable()) {
                 btnReply.setDisable(false);
                 btnReplyAll.setDisable(false);
                 btnForward.setDisable(false);
@@ -205,10 +205,10 @@ public class EmailClientController {
 
     }
 
-    protected void activeFiled(){
+    protected void activeFiled() {
         paneDetails.setVisible(true);
         paneNoSelect.setVisible(false);
-        activate=true;
+        activate = true;
     }
 
     private void btnNewEmailClick(ActionEvent actionEvent) {
@@ -219,19 +219,19 @@ public class EmailClientController {
 
     private void btnReplyClick(ActionEvent actionEvent) {
 
-        showEmailWriter(selectEmail.getSender(), "R: "+ selectEmail.getObject(), selectEmail.getText());
+        showEmailWriter(selectEmail.getSender(), "R: " + selectEmail.getObject(), selectEmail.getText());
 
     }
 
     private void btnReplyAllClick(ActionEvent actionEvent) {
-        showEmailWriter(selectEmail.getSender() +","+selectEmail.getReceivers(), "R: "+ selectEmail.getObject(), selectEmail.getText());
+        showEmailWriter(selectEmail.getSender() + "," + selectEmail.getReceivers(), "R: " + selectEmail.getObject(), selectEmail.getText());
     }
 
     private void btnForwardClick(ActionEvent actionEvent) {
-        showEmailWriter("", "I: "+ selectEmail.getObject(), selectEmail.getText());
+        showEmailWriter("", "I: " + selectEmail.getObject(), selectEmail.getText());
     }
 
-    private void showEmailWriter(String to, String object, String text){
+    private void showEmailWriter(String to, String object, String text) {
 
         try {
             FXMLLoader loaderEmailWriter = new FXMLLoader(getClass().getResource("../resources/emailWriter.fxml"));
@@ -239,7 +239,7 @@ public class EmailClientController {
             Stage writeStage = new Stage();
             EmailWriterController emailWriterController = loaderEmailWriter.getController();
             EmailWriter modelWriter = new EmailWriter();
-            emailWriterController.initialize(modelWriter, /*model,*/ writeStage, user /*this.model.emailAddressProperty()*/, to, object, text);
+            emailWriterController.initialize(writeStage, user, to, object, text);
             writeStage.initModality(Modality.APPLICATION_MODAL);
             writeStage.setScene(scene);
             writeStage.setMinWidth(650);
@@ -247,35 +247,35 @@ public class EmailClientController {
             writeStage.setResizable(false);
             writeStage.show();
 
-            writeStage.setOnCloseRequest( new EventHandler<WindowEvent>() {
+            writeStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
                 @Override
                 public void handle(WindowEvent windowEvent) {
                     showEmails(true, false);
                 }
             });
 
-        }catch (Exception e){
-            System.out.println("Exception: "+ e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getMessage());
         }
 
     }
 
-    protected void btnDeleteClick(ActionEvent actionEvent){
+    protected void btnDeleteClick(ActionEvent actionEvent) {
 
         boolean result = model.deleteEmail(user, selectEmail);
 
-        if(result) {
+        if (result) {
             viewEmailDetail(emptyEmail);                                                //chiamo il metodo viewEmailDetail prende l'email e cambia i componenti grafici
             labelConnectionError.setVisible(false);
             labelAccountName.setVisible(true);
-        }else{
+        } else {
             labelConnectionError.setVisible(true);
             labelAccountName.setVisible(false);
         }
     }
 
     protected void viewEmailDetail(Email email) {
-        if(email != null) {
+        if (email != null) {
             textFrom.setText(email.getSender());    //campi assegnati da scenebuilder fx::ID
             textReceivers.setText(email.getReceivers());
             textObject.setText(email.getObject());
@@ -283,3 +283,4 @@ public class EmailClientController {
             textEmail.setText(email.getText());
         }
     }
+}

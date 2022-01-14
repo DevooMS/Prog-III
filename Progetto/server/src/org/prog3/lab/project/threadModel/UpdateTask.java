@@ -4,8 +4,6 @@ package org.prog3.lab.project.threadModel;
 import org.prog3.lab.project.model.User;
 
 import java.io.*;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Semaphore;
 
@@ -27,6 +25,7 @@ public class UpdateTask implements Runnable{
     }
 
     public void run(){
+        logThreads.execute(new LogTask(connectionSem, "./server/src/org/prog3/lab/project/resources/log/connection/"+user.getUserEmail(), "open update connection"));
 
         try {
             File dir = new File (directoryPath);
@@ -36,103 +35,104 @@ public class UpdateTask implements Runnable{
 
             outStream.writeObject(countFiles);
 
-            for(int i=0; i<countFiles; i++) {
-                try {
-                    user.getReadWrite().acquire();
+            try {
+                user.getReadWrite().acquire();
 
-                    BufferedReader reader = new BufferedReader(new FileReader(directoryPath + "/"+ listOfFiles[i].getName()));
+                for(int i=0; i<countFiles; i++) {
 
-                    String line = reader.readLine();
+                        BufferedReader reader = new BufferedReader(new FileReader(directoryPath + "/"+ listOfFiles[i].getName()));
 
-                    String lineToSend = "";
+                        String line = reader.readLine();
 
-                    boolean rewrite = false;
+                        String lineToSend = "";
 
-                    StringBuilder fileContent = new StringBuilder();
+                        boolean rewrite = false;
 
-                    if ((line.equals("--READ--") && startUpdate) || line.equals("--NO_READ--")) {
+                        StringBuilder fileContent = new StringBuilder();
 
-                        outStream.writeObject(listOfFiles[i].getName());
+                        if ((line.equals("--READ--") && startUpdate) || line.equals("--NO_READ--")) {
 
-                        if (line.equals("--NO_READ--")) {
-                            rewrite = true;
-                            fileContent.append("--READ--" + System.getProperty("line.separator"));
-                            countNoRead++;
-                        }
+                            outStream.writeObject(listOfFiles[i].getName());
 
-                        line = reader.readLine();
-
-                        while (line != null) {
-
-                            if (line.equals("--START--")) {
-
-                                line = reader.readLine();
-
-                                while (!line.equals("--END--")) {
-                                    lineToSend += line;
-
-                                    line = reader.readLine();
-                                }
-
-                                if (rewrite) {
-                                    fileContent.append("--START--" + System.getProperty("line.separator"));
-                                    fileContent.append(lineToSend + System.getProperty("line.separator"));
-                                    fileContent.append("--END--" + System.getProperty("line.separator"));
-                                }
-
-                            } else if (line.equals("--START_TEXT--")) {
-
-                                line = reader.readLine();
-
-                                while (!line.equals("--END_TEXT--")) {
-                                    if (line.equals(""))
-                                        lineToSend += "\n\n";
-                                    else
-                                        lineToSend += line + "\n";
-
-                                    line = reader.readLine();
-                                }
-
-                                if (rewrite) {
-                                    fileContent.append("--START_TEXT--" + System.getProperty("line.separator"));
-                                    fileContent.append(lineToSend + System.getProperty("line.separator"));
-                                    fileContent.append("--END_TEXT--" + System.getProperty("line.separator"));
-                                }
-
+                            if (line.equals("--NO_READ--")) {
+                                rewrite = true;
+                                fileContent.append("--READ--" + System.getProperty("line.separator"));
+                                countNoRead++;
                             }
-
-                            outStream.writeObject(lineToSend);
-
-                            lineToSend = "";
 
                             line = reader.readLine();
 
+                            while (line != null) {
+
+                                if (line.equals("--START--")) {
+
+                                    line = reader.readLine();
+
+                                    while (!line.equals("--END--")) {
+                                        lineToSend += line;
+
+                                        line = reader.readLine();
+                                    }
+
+                                    if (rewrite) {
+                                        fileContent.append("--START--" + System.getProperty("line.separator"));
+                                        fileContent.append(lineToSend + System.getProperty("line.separator"));
+                                        fileContent.append("--END--" + System.getProperty("line.separator"));
+                                    }
+
+                                } else if (line.equals("--START_TEXT--")) {
+
+                                    line = reader.readLine();
+
+                                    while (!line.equals("--END_TEXT--")) {
+                                        if (line.equals(""))
+                                            lineToSend += "\n\n";
+                                        else
+                                            lineToSend += line + "\n";
+
+                                        line = reader.readLine();
+                                    }
+
+                                    if (rewrite) {
+                                        fileContent.append("--START_TEXT--" + System.getProperty("line.separator"));
+                                        fileContent.append(lineToSend + System.getProperty("line.separator"));
+                                        fileContent.append("--END_TEXT--" + System.getProperty("line.separator"));
+                                    }
+
+                                }
+
+                                outStream.writeObject(lineToSend);
+
+                                lineToSend = "";
+
+                                line = reader.readLine();
+
+                            }
+
                         }
 
-                    }
+                        reader.close();
 
-                    reader.close();
+                        if (rewrite) {
+                            FileWriter fstreamWrite = new FileWriter(directoryPath + "/" + listOfFiles[i].getName());
+                            BufferedWriter out = new BufferedWriter(fstreamWrite);
+                            out.write(fileContent.toString());
+                            out.flush();
+                            fstreamWrite.close();
+                            out.close();
+                        }
 
-                    if (rewrite) {
-                        FileWriter fstreamWrite = new FileWriter(directoryPath + "/" + listOfFiles[i].getName());
-                        BufferedWriter out = new BufferedWriter(fstreamWrite);
-                        out.write(fileContent.toString());
-                        out.flush();
-                        fstreamWrite.close();
-                        out.close();
-                    }
-
-                    outStream.writeObject("--END_EMAIL--");
-                } finally{
-                    user.getReadWrite().release();;
+                        outStream.writeObject("--END_EMAIL--");
                 }
+            } finally{
+                user.getReadWrite().release();;
             }
 
             outStream.writeObject(countNoRead);
 
             outStream.close();
 
-            logThreads.execute(new LogTask(connectionSem, "./server/src/org/prog3/lab/project/resources/log/connection/"+user.getUserEmail(), "update connection"));
+            logThreads.execute(new LogTask(connectionSem, "./server/src/org/prog3/lab/project/resources/log/connection/"+user.getUserEmail(), "close update connection"));
 
         }catch (IOException | InterruptedException e) {
             e.printStackTrace();

@@ -24,9 +24,11 @@ public class LogoutTask implements Runnable{
 
     public void run(){
 
+        logThreads.execute(new LogTask(connectionSem, "./server/src/org/prog3/lab/project/resources/log/connection/"+user.getUserEmail(), "open logout connection"));
+
         logThreads.execute(new LogTask(accessSem, "./server/src/org/prog3/lab/project/resources/log/logout/"+user.getUserEmail(), "logout"));
 
-        logThreads.execute(new LogTask(connectionSem, "./server/src/org/prog3/lab/project/resources/log/connection/"+user.getUserEmail(), "logout connection"));
+        logThreads.execute(new LogTask(connectionSem, "./server/src/org/prog3/lab/project/resources/log/connection/"+user.getUserEmail(), "close logout connection"));
 
     }
 }

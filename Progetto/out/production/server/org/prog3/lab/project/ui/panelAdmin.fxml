@@ -10,10 +10,12 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.text.Font?>
 
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="535.0" prefWidth="741.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.prog3.lab.project.ui.ServerController">
     <children>
-        <SplitPane dividerPositions="0.2976995940460081" prefHeight="535.0" prefWidth="741.0">
+        <SplitPane dividerPositions="0.31268596159047873" prefHeight="535.0" prefWidth="741.0">
             <items>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                     <children>
@@ -26,58 +28,69 @@
                     <ListView fx:id="listClients" prefHeight="475.0" prefWidth="217.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="58.0" />
                     </children>
                 </AnchorPane>
-                <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE">
-                    <tabs>
-                  <Tab text="Connection">
-                    <content>
-                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                           <children>
-                              <Label fx:id="noConnection" layoutX="209.0" layoutY="14.0" text="No log connection" AnchorPane.topAnchor="15.0" />
-                              <ListView fx:id="listConnection" prefHeight="200.0" prefWidth="200.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                           </children>
-                        </AnchorPane>
-                    </content>
-                  </Tab>
-                        <Tab fx:id="LogOut" text="Send">
-                            <content>
-                                <AnchorPane fx:id="LogOutText" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                           <children>
-                              <Label fx:id="noSend" layoutX="225.0" layoutY="14.0" text="No log send" AnchorPane.topAnchor="15.0" />
-                              <ListView fx:id="listSend" prefHeight="200.0" prefWidth="200.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                           </children></AnchorPane>
-                            </content>
+            <StackPane prefHeight="150.0" prefWidth="200.0">
+               <children>
+                      <TabPane fx:id="tabLog" prefHeight="534.0" prefWidth="495.0" tabClosingPolicy="UNAVAILABLE" visible="false">
+                          <tabs>
+                        <Tab text="Connection">
+                          <content>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <Label fx:id="noConnection" layoutX="209.0" layoutY="14.0" text="No log connection" AnchorPane.topAnchor="15.0" />
+                                    <ListView fx:id="listConnection" prefHeight="200.0" prefWidth="200.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                 </children>
+                              </AnchorPane>
+                          </content>
                         </Tab>
-                  <Tab text="Received">
-                    <content>
-                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                           <children>
-                              <Label fx:id="noReceived" layoutX="216.0" layoutY="5.0" text="No log received" AnchorPane.topAnchor="15.0" />
-                              <ListView fx:id="listReceived" prefHeight="200.0" prefWidth="200.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                           </children>
-                        </AnchorPane>
-                    </content>
-                  </Tab>
-                        <Tab fx:id="LogIn" text="Log In">
-                            <content>
-                                <AnchorPane fx:id="LoginText" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                           <children>
-                              <Label fx:id="noLogin" layoutX="225.0" layoutY="5.0" text="No log login" AnchorPane.topAnchor="15.0" />
-                              <ListView fx:id="listLogin" prefHeight="200.0" prefWidth="200.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                           </children></AnchorPane>
-                            </content>
+                              <Tab fx:id="LogOut" text="Send">
+                                  <content>
+                                      <AnchorPane fx:id="LogOutText" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <Label fx:id="noSend" layoutX="225.0" layoutY="14.0" text="No log send" AnchorPane.topAnchor="15.0" />
+                                    <ListView fx:id="listSend" prefHeight="200.0" prefWidth="200.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                 </children>
+                              </AnchorPane>
+                                  </content>
+                              </Tab>
+                        <Tab text="Received">
+                          <content>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <Label fx:id="noReceived" layoutX="216.0" layoutY="5.0" text="No log received" AnchorPane.topAnchor="15.0" />
+                                    <ListView fx:id="listReceived" prefHeight="200.0" prefWidth="200.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                 </children>
+                              </AnchorPane>
+                          </content>
                         </Tab>
-                  <Tab text="Log out">
-                    <content>
-                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                           <children>
-                              <Label fx:id="noLogout" layoutX="220.0" layoutY="5.0" text="No log logout" AnchorPane.topAnchor="15.0" />
-                              <ListView fx:id="listLogout" prefHeight="200.0" prefWidth="200.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                           </children>
-                        </AnchorPane>
-                    </content>
-                  </Tab>
-                    </tabs>
-                </TabPane>
+                              <Tab fx:id="LogIn" text="Log In">
+                                  <content>
+                                      <AnchorPane fx:id="LoginText" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <Label fx:id="noLogin" layoutX="225.0" layoutY="5.0" text="No log login" AnchorPane.topAnchor="15.0" />
+                                    <ListView fx:id="listLogin" prefHeight="200.0" prefWidth="200.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                 </children>
+                              </AnchorPane>
+                                  </content>
+                              </Tab>
+                        <Tab text="Log out">
+                          <content>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <Label fx:id="noLogout" layoutX="220.0" layoutY="5.0" text="No log logout" AnchorPane.topAnchor="15.0" />
+                                    <ListView fx:id="listLogout" prefHeight="200.0" prefWidth="200.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                 </children>
+                              </AnchorPane>
+                          </content>
+                        </Tab>
+                          </tabs>
+                      </TabPane>
+                  <Label fx:id="labelInfo" prefHeight="108.0" prefWidth="178.0" text="Selezionare un utente" textAlignment="RIGHT" StackPane.alignment="CENTER">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Label>
+               </children>
+            </StackPane>
             </items>
         </SplitPane>
     </children>

@@ -1,7 +1,5 @@
 package org.prog3.lab.project.model;
 
-import javafx.beans.property.StringProperty;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;

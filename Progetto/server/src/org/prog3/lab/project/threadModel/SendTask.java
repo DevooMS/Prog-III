@@ -44,6 +44,8 @@ public class SendTask implements Runnable{
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy_HHmmss");
         String data = formatter.format(LocalDateTime.now());
 
+        logThreads.execute(new LogTask(connectionSem, "./server/src/org/prog3/lab/project/resources/log/connection/"+user.getUserEmail(), "open send connection"));
+
         file_send = new File(path+data+".txt");
 
         String response;
@@ -51,8 +53,6 @@ public class SendTask implements Runnable{
         try {
 
             if(file_send.exists()){
-
-                //response = "Errore durante l'invio. Riprovare.";
                 response = "send_error";
             }else {
 
@@ -79,9 +79,6 @@ public class SendTask implements Runnable{
                     user.getReadWrite().release();;
                 }
 
-                sendToReceivers();
-
-                //response = "Email inviata correttamente.";
                 response = "send_correct";
 
             }
@@ -90,13 +87,13 @@ public class SendTask implements Runnable{
 
             outStream.close();
 
-            logThreads.execute(new LogTask(connectionSem, "./server/src/org/prog3/lab/project/resources/log/connection/"+user.getUserEmail(), "send connection"));
+            sendToReceivers();
 
             logThreads.execute(new LogTask(sendSem, "./server/src/org/prog3/lab/project/resources/log/send/"+user.getUserEmail(), "send"));
+
+            logThreads.execute(new LogTask(connectionSem, "./server/src/org/prog3/lab/project/resources/log/connection/"+user.getUserEmail(), "close send connection"));
         } catch (IOException | InterruptedException e) {
-
             e.printStackTrace();
-
         }
     }
 

@@ -7,6 +7,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import javax.print.attribute.Attribute;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -142,7 +143,6 @@ public class EmailClient {
 
                 Vector<String> operationRequest = new Vector<>();
                 operationRequest.add("remove");
-                //operationRequest.add(emailAddressProperty().get());
                 operationRequest.add(emailType);
                 operationRequest.add(emailId);
 
