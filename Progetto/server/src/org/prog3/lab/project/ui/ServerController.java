@@ -2,8 +2,9 @@ package org.prog3.lab.project.ui;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.event.EventHandler;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TabPane;
@@ -12,7 +13,6 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import org.prog3.lab.project.model.Server;
-import org.prog3.lab.project.model.User;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -21,8 +21,10 @@ import java.net.Socket;
 import java.util.Vector;
 import java.util.concurrent.Semaphore;
 
-
 public class ServerController {
+
+    @FXML
+    private Button btnLogoff;
 
     @FXML
     private Label labelInfo;
@@ -46,6 +48,12 @@ public class ServerController {
     private ListView listSend;
 
     @FXML
+    private Label noErrorSend;
+
+    @FXML
+    private ListView listErrorSend;
+
+    @FXML
     private Label noReceived;
 
     @FXML
@@ -63,16 +71,25 @@ public class ServerController {
     @FXML
     private ListView listLogout;
 
+    @FXML
+    private Label noRemove;
+
+    @FXML
+    private ListView listRemove;
+
     private Server model;
     private Stage stage;
     private Semaphore loginSem;
     private Semaphore logoutSem;
     private Semaphore connectionSem;
     private Semaphore sendSem;
+    private Semaphore errorSendSem;
     private Semaphore receivedSem;
+    private Semaphore removeSem;
+    Timeline timeline;
 
     @FXML
-    public void initialize(Stage stage, Semaphore loginSem, Semaphore logoutSem, Semaphore connectionSem, Semaphore sendSem, Semaphore receivedSem){
+    public void initialize(Stage stage, Semaphore loginSem, Semaphore logoutSem, Semaphore connectionSem, Semaphore sendSem,  Semaphore errorSendSem, Semaphore receivedSem, Semaphore removeSem)  {
         if (this.model != null)
             throw new IllegalStateException("Model can only be initialized once");
 
@@ -82,44 +99,56 @@ public class ServerController {
         this.logoutSem = logoutSem;
         this.connectionSem = connectionSem;
         this.sendSem = sendSem;
+        this.errorSendSem = errorSendSem;
         this.receivedSem = receivedSem;
+        this.removeSem = removeSem;
 
         listClients.itemsProperty().bind(model.listClientsProperty());
         listClients.setOnMouseClicked(this::updateLog);
         listConnection.itemsProperty().bind(model.listConnectionProperty());
         listSend.itemsProperty().bind(model.listSendProperty());
+        listErrorSend.itemsProperty().bind(model.listErrorSendProperty());
         listReceived.itemsProperty().bind(model.listReceivedProperty());
         listLogin.itemsProperty().bind(model.listLoginProperty());
         listLogout.itemsProperty().bind(model.listLogoutProperty());
+        listRemove.itemsProperty().bind(model.listRemoveProperty());
 
-        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(30), ev -> {
-            updateLogForType();
-        }));
+        timeline = new Timeline(new KeyFrame(Duration.seconds(30), ev -> updateLogForType()));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
 
-        stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(WindowEvent t) {
-                timeline.stop();
-                try {
-                    Socket s = new Socket(InetAddress.getLocalHost().getHostName(), 8190);
+        btnLogoff.setOnAction(this::btnLogOffClick);
 
-                    ObjectOutputStream outStream = new ObjectOutputStream(s.getOutputStream());
+        stage.setOnCloseRequest(this::stageClose);
 
-                    Vector<String> operationRequest = new Vector<>();
+        model.addUser(getClass().getResource("../resources/userEmails").getPath());
+    }
 
-                    operationRequest.add(0, "terminate");
+    private void btnLogOffClick(ActionEvent actionEvent) {
+        serverLogOff();
+    }
 
-                    outStream.writeObject(operationRequest);
+    private void stageClose(WindowEvent windowEvent) {
+        serverLogOff();
+    }
 
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+    private void serverLogOff() {
+        timeline.stop();
+        try {
+            Socket s = new Socket(InetAddress.getLocalHost().getHostName(), 8190);
 
-        model.addUser("./server/src/org/prog3/lab/project/resources/userEmails.txt");
+            ObjectOutputStream outStream = new ObjectOutputStream(s.getOutputStream());
+
+            Vector<String> operationRequest = new Vector<>();
+
+            operationRequest.add(0, "terminate");
+
+            outStream.writeObject(operationRequest);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        stage.close();
     }
 
     private void updateLog(MouseEvent mouseEvent) {
@@ -135,19 +164,23 @@ public class ServerController {
 
     private void updateLogForType() {
         if (listClients.getSelectionModel().getSelectedItem() != null){
-            logConnection((String) listClients.getSelectionModel().getSelectedItem(), connectionSem);
+            logConnection((String) listClients.getSelectionModel().getSelectedItem());
 
-            logSend((String) listClients.getSelectionModel().getSelectedItem(), sendSem);
+            logSend((String) listClients.getSelectionModel().getSelectedItem());
 
-            logReceived((String) listClients.getSelectionModel().getSelectedItem(), receivedSem);
+            logErrorSend((String) listClients.getSelectionModel().getSelectedItem());
 
-            logLogin((String) listClients.getSelectionModel().getSelectedItem(), loginSem);
+            logReceived((String) listClients.getSelectionModel().getSelectedItem());
 
-            logLogout((String) listClients.getSelectionModel().getSelectedItem(), logoutSem);
+            logLogin((String) listClients.getSelectionModel().getSelectedItem());
+
+            logLogout((String) listClients.getSelectionModel().getSelectedItem());
+
+            logRemove((String) listClients.getSelectionModel().getSelectedItem());
         }
     }
 
-    private void logConnection(String item, Semaphore connectionSem){
+    private void logConnection(String item){
         if (model.showLogConnection(item, connectionSem)) {
             noConnection.setVisible(false);
             listConnection.setVisible(true);
@@ -157,7 +190,7 @@ public class ServerController {
         }
     }
 
-    private void logSend(String item, Semaphore sendSem){
+    private void logSend(String item){
         if(model.showLogSend(item, sendSem)){
             noSend.setVisible(false);
             listSend.setVisible(true);
@@ -167,7 +200,17 @@ public class ServerController {
         }
     }
 
-    private void logReceived(String item, Semaphore receivedSem){
+    private void logErrorSend(String item){
+        if(model.showLogErrorSend(item, errorSendSem)){
+            noErrorSend.setVisible(false);
+            listErrorSend.setVisible(true);
+        } else{
+            noErrorSend.setVisible(true);
+            listErrorSend.setVisible(false);
+        }
+    }
+
+    private void logReceived(String item){
         if(model.showLogReceived(item, receivedSem)){
             noReceived.setVisible(false);
             listReceived.setVisible(true);
@@ -177,7 +220,7 @@ public class ServerController {
         }
     }
 
-    private void logLogin(String item, Semaphore loginSem){
+    private void logLogin(String item){
         if(model.showLogLogin(item, loginSem)){
             noLogin.setVisible(false);
             listLogin.setVisible(true);
@@ -187,13 +230,23 @@ public class ServerController {
         }
     }
 
-    private void logLogout(String item, Semaphore logoutSem){
+    private void logLogout(String item){
         if(model.showLogLogout(item, logoutSem)){
             noLogout.setVisible(false);
             listLogout.setVisible(true);
         } else{
             noLogout.setVisible(true);
             listLogout.setVisible(false);
+        }
+    }
+
+    private void logRemove(String item){
+        if(model.showLogRemove(item, removeSem)){
+            noRemove.setVisible(false);
+            listRemove.setVisible(true);
+        } else{
+            noRemove.setVisible(true);
+            listRemove.setVisible(false);
         }
     }
 }

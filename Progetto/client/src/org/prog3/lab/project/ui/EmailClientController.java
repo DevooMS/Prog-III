@@ -4,7 +4,6 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -17,17 +16,12 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import org.prog3.lab.project.model.Email;
 import org.prog3.lab.project.model.EmailClient;
-import org.prog3.lab.project.model.EmailWriter;
 import org.prog3.lab.project.model.User;
 
 public class EmailClientController {
-
-    @FXML
-    private Label labelConnectionError;
 
     @FXML
     private Label labelAccountName;
@@ -39,7 +33,10 @@ public class EmailClientController {
     private Button btnUpdate;
 
     @FXML
-    private Label labelError;
+    private Label onlineLabel;
+
+    @FXML
+    private Label offlineLabel;
 
     @FXML
     private ListView listReceivedEmails;
@@ -83,30 +80,31 @@ public class EmailClientController {
     @FXML
     private Tab tabReceivedEmails;
 
-    @FXML
-    private Tab tabSendedEmails;
-
     private EmailClient model;
     private User user;
-    private Stage stage;
+    boolean startUpdate;
     private static Email selectEmail;
     private Email emptyEmail;
     private boolean activate = false;
+    private Timeline emailUpdate;
 
     @FXML
-    public void initialize(EmailClient model, User user, Stage stage) {
+    public void initialize(User user, Stage stage) {
         if (this.model != null)
             throw new IllegalStateException("Model can only be initialized once");
 
-        this.model = model;
         this.user = user;
-        this.stage = stage;
+
+        this.model = new EmailClient();
+
+        model.serverLogin(user);
+
+        startUpdate = true;
         //istanza nuovo client
-        //model.generateRandomEmails(10);
-        showEmails(true, true);  //inizio partendo con update della lista inviate
+        showEmails(true, startUpdate);  //inizio partendo con update della lista inviate
 
         //binding tra lstEmails e inboxProperty
-        labelAccountName.textProperty().bind(model.emailAddressProperty());          //prendo il labelAcc.. E accedo al textProperty e faccio il bind al nostro property|| ogno volta che si modifica model mi modifica anche listReceiv e modifica in tempo reale il view di questo label
+        labelAccountName.setText(user.getUserEmail());          //prendo il labelAcc.. E accedo al textProperty e faccio il bind al nostro property|| ogno volta che si modifica model mi modifica anche listReceiv e modifica in tempo reale il view di questo label
         listReceivedEmails.itemsProperty().bind(model.receivedEmailsProperty());     //stessa cosa per le listReceivedEmails il bind cambia i dati la view cambia quando i dati sono cambiati
         listReceivedEmails.setOnMouseClicked(this::showSelectReceivedEmail);         //chiamo la funzione showSelectRecivedEmail alla presione del mouse
         listSendedEmails.itemsProperty().bind(model.sendedEmailsProperty());
@@ -123,24 +121,19 @@ public class EmailClientController {
 
         viewEmailDetail(emptyEmail);                                                                //chiamo il metodo viewEmailDetail prende l'email e cambia i componenti grafici
 
-        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(30), ev -> {
-            showEmails(false, false);
-        }));
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.play();
+        emailUpdate = new Timeline(new KeyFrame(Duration.seconds(30), ev -> showEmails(false, startUpdate)));
+        emailUpdate.setCycleCount(Timeline.INDEFINITE);
+        emailUpdate.play();
 
-        stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(WindowEvent windowEvent) {
-                timeline.stop();
-                model.serverLogout(user);
-            }
+        stage.setOnCloseRequest(windowEvent -> {
+            emailUpdate.stop();
+            model.serverLogout(user);
         });
     }
 
     private void updateEmailsLists(Event event) {
 
-        showEmails(false, false);
+        showEmails(false, startUpdate);
 
     }
 
@@ -148,19 +141,26 @@ public class EmailClientController {
         int countNewEmails = model.updateEmailslists(user, updateSended, startUpdate);
 
         if (countNewEmails < 0) {
-            labelConnectionError.setVisible(true);
-            labelAccountName.setVisible(false);
+            onlineLabel.setVisible(false);
+            offlineLabel.setVisible(true);
         } else if (countNewEmails == 0) {
-            labelConnectionError.setVisible(false);
-            labelAccountName.setVisible(true);
-        } else if (countNewEmails > 0) {
-            labelConnectionError.setVisible(false);
-            labelAccountName.setVisible(true);
+            onlineLabel.setVisible(true);
+            offlineLabel.setVisible(false);
+
+            if(this.startUpdate)
+                this.startUpdate = false;
+        } else {
+            onlineLabel.setVisible(true);
+            offlineLabel.setVisible(false);
+
+            if(this.startUpdate)
+                this.startUpdate = false;
+
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setHeaderText(null);
             alert.setTitle("Nuove email ricevute");
             alert.setContentText("Hai ricevuto " + countNewEmails + "email");
-            alert.show();
+            alert.showAndWait();
         }
     }
 
@@ -238,8 +238,7 @@ public class EmailClientController {
             Scene scene = new Scene(loaderEmailWriter.load());
             Stage writeStage = new Stage();
             EmailWriterController emailWriterController = loaderEmailWriter.getController();
-            EmailWriter modelWriter = new EmailWriter();
-            emailWriterController.initialize(writeStage, user, to, object, text);
+            emailWriterController.initialize(user, to, object, text);
             writeStage.initModality(Modality.APPLICATION_MODAL);
             writeStage.setScene(scene);
             writeStage.setMinWidth(650);
@@ -247,12 +246,7 @@ public class EmailClientController {
             writeStage.setResizable(false);
             writeStage.show();
 
-            writeStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-                @Override
-                public void handle(WindowEvent windowEvent) {
-                    showEmails(true, false);
-                }
-            });
+            writeStage.setOnCloseRequest(windowEvent -> showEmails(true, startUpdate));
 
         } catch (Exception e) {
             System.out.println("Exception: " + e.getMessage());
@@ -262,15 +256,25 @@ public class EmailClientController {
 
     protected void btnDeleteClick(ActionEvent actionEvent) {
 
-        boolean result = model.deleteEmail(user, selectEmail);
+        String response = model.deleteEmail(user, selectEmail);
 
-        if (result) {
-            viewEmailDetail(emptyEmail);                                                //chiamo il metodo viewEmailDetail prende l'email e cambia i componenti grafici
-            labelConnectionError.setVisible(false);
-            labelAccountName.setVisible(true);
-        } else {
-            labelConnectionError.setVisible(true);
-            labelAccountName.setVisible(false);
+        switch (response) {
+            case "remove_correct" -> {
+                viewEmailDetail(emptyEmail);                                                //chiamo il metodo viewEmailDetail prende l'email e cambia i componenti grafici
+                onlineLabel.setVisible(true);
+                offlineLabel.setVisible(false);
+            }
+            case "remove_error" -> {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setHeaderText(null);
+                alert.setTitle("Errore durante la rimozione");
+                alert.setContentText("Impossibile eliminare la mail selezionata");
+                alert.showAndWait();
+            }
+            case "server_error" -> {
+                onlineLabel.setVisible(false);
+                offlineLabel.setVisible(true);
+            }
         }
     }
 

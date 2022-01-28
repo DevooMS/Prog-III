@@ -34,11 +34,14 @@ public class EmailWriter {
 
                 response = (String) inStream.readObject();
 
+            }catch (IOException | ClassNotFoundException e){
+                e.printStackTrace();
+                response ="server_error";
             }finally{
                 s.close();
             }
 
-        } catch (IOException | ClassNotFoundException e){
+        } catch (IOException e){
             e.printStackTrace();
             response ="server_error";
         }

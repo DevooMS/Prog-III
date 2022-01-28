@@ -2,12 +2,9 @@ package org.prog3.lab.project.model;
 
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import javax.print.attribute.Attribute;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -18,37 +15,62 @@ public class EmailClient {
     private final ObservableList<Email> listSendedEmails;      //e una colezione oservabile di Email
     private final ListProperty<Email> sendedEmailsProperty;
     private final ListProperty<Email> receivedEmailsProperty;
-    private final StringProperty emailAddress;
 
-    public EmailClient(String emailAddress){
-        this.listReceivedEmails = FXCollections.observableArrayList();      //creo un Observable List
-        this.listSendedEmails = FXCollections.observableArrayList();        //creo un Observable List
+    public EmailClient(){
+        this.listReceivedEmails = FXCollections.observableArrayList();       //creo un Observable List
         this.receivedEmailsProperty = new SimpleListProperty<>();           //creo un SimpleList
         this.receivedEmailsProperty.set(listReceivedEmails);                //PropertyList dentro quale ho un Observable List
+        this.listSendedEmails = FXCollections.observableArrayList();     //creo un Observable List
         this.sendedEmailsProperty = new SimpleListProperty<>();
         this.sendedEmailsProperty.set(listSendedEmails);
-        this.emailAddress = new SimpleStringProperty(emailAddress);          //crea un Property di tipo string
     }
 
     public ListProperty<Email> receivedEmailsProperty(){ return receivedEmailsProperty;}
 
     public ListProperty<Email> sendedEmailsProperty(){ return sendedEmailsProperty;}
 
-    public StringProperty emailAddressProperty(){
-        return emailAddress;
+    public void serverLogin(User user){
+        try {
+            Socket s = new Socket(InetAddress.getLocalHost().getHostName(), 8190);
+
+            try {
+
+                ObjectOutputStream outStream = new ObjectOutputStream(s.getOutputStream());
+
+                Vector<String> operationRequest = new Vector<>();
+                operationRequest.add("login");
+
+                outStream.writeObject(operationRequest);
+
+                outStream.writeObject(user);
+
+            } catch (IOException e){
+                e.printStackTrace();
+            } finally{
+                s.close();
+            }
+
+        } catch (IOException e){
+            e.printStackTrace();
+        }
     }
 
-    public boolean deleteEmail(User user, Email email) {
-        boolean result = serverRemoveEmail(user, email.getType(), email.getId());
+    public String deleteEmail(User user, Email email) {
+        String response = serverRemoveEmail(user, email.getType(), email.getId());
 
-        if(result) {
-            if (email.getType().equals("receivedEmails"))
-                listReceivedEmails.remove(email);           //aggisco su ObservabeList e rimuovo email passato come parametro
-            else
+        if(response.equals("remove_correct")) {
+            if (email.getType().equals("receivedEmails")) {
+                user.removeReceivedEmail(email);
+                listReceivedEmails.clear();
+                listReceivedEmails.setAll(user.getReceivedEmails());
+            }else
                 listSendedEmails.remove(email);
+                user.removeSendedEmail(email);
+                listSendedEmails.clear();
+                listSendedEmails.setAll(user.getSendedEmails());
         }
 
-        return result;
+        return response;
     }
 
     public int updateEmailslists(User user, boolean updateSended, boolean startUpdate) {
@@ -56,17 +78,17 @@ public class EmailClient {
         int countNewEmails;
 
         if (updateSended)
-            countNewEmails = serverRequestUpdateList(user, listSendedEmails, "sendedEmails", startUpdate);
+            serverRequestUpdateList(user,"sendedEmails", startUpdate);
 
-        countNewEmails = serverRequestUpdateList(user, listReceivedEmails, "receivedEmails", startUpdate);
+        countNewEmails = serverRequestUpdateList(user, "receivedEmails", startUpdate);
 
         return countNewEmails;
 
     }
 
-    private int serverRequestUpdateList(User user, ObservableList list, String mailType, boolean startUpdate){
+    private int serverRequestUpdateList(User user, String mailType, boolean startUpdate) {
 
-        int countEmails = 0;
+        int countEmails;
 
         try {
             Socket s = new Socket(InetAddress.getLocalHost().getHostName(), 8190);
@@ -79,7 +101,6 @@ public class EmailClient {
 
                 Vector<String> operationRequest = new Vector<>();
                 operationRequest.add("update");
-                //operationRequest.add(emailAddressProperty().get());
                 operationRequest.add(mailType);
                 operationRequest.add(String.valueOf(startUpdate));
 
@@ -91,7 +112,7 @@ public class EmailClient {
 
                 Vector<String> emailDetail = new Vector<>();
 
-                for(int i=0; i<countEmails; i++) {
+                for (int i = 0; i < countEmails; i++) {
 
                     int j = 0;
 
@@ -103,36 +124,48 @@ public class EmailClient {
                         email = (String) inStream.readObject();
                     }
 
-                    if(emailDetail.size() > 0) {
+                    if (emailDetail.size() > 0) {
                         Email e;
 
-                        if(mailType.equals("receivedEmails"))
-                             e = new Email(emailDetail.get(0), mailType, emailDetail.get(1), emailDetail.get(2), emailDetail.get(3), emailDetail.get(4), emailDetail.get(5));   //nuovo oggetto email
-                        else
-                             e = new Email(emailDetail.get(0), mailType, emailDetail.get(2), emailDetail.get(1), emailDetail.get(3), emailDetail.get(4), emailDetail.get(5));
-                        list.add(e);
+                        if (mailType.equals("receivedEmails")) {
+                            e = new Email(emailDetail.get(0), mailType, emailDetail.get(1), emailDetail.get(2), emailDetail.get(3), emailDetail.get(4), emailDetail.get(5));   //nuovo oggetto email
+                            user.addReceivedEmail(e);
+                        }else {
+                            e = new Email(emailDetail.get(0), mailType, emailDetail.get(2), emailDetail.get(1), emailDetail.get(3), emailDetail.get(4), emailDetail.get(5));
+                            user.addSendedEmails(e);
+                        }
                     }
 
                 }
 
+                if (mailType.equals("receivedEmails")) {
+                    listReceivedEmails.clear();
+                    listReceivedEmails.addAll(user.getReceivedEmails());
+                }else {
+                    listSendedEmails.clear();
+                    listSendedEmails.addAll(user.getSendedEmails());
+                }
+
                 countEmails = (Integer) inStream.readObject();
 
-            }finally{
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+                countEmails = -1;
+            } finally {
                 s.close();
             }
 
-        } catch (IOException | ClassNotFoundException e){
+        } catch (IOException e) {
             e.printStackTrace();
             countEmails = -1;
         }
 
         return countEmails;
-
     }
 
-    private boolean serverRemoveEmail(User user, String emailType, String emailId){
+    private String serverRemoveEmail(User user, String emailType, String emailId){
 
-        boolean result;
+        String response;
 
         try {
             Socket s = new Socket(InetAddress.getLocalHost().getHostName(), 8190);
@@ -140,6 +173,8 @@ public class EmailClient {
             try {
 
                 ObjectOutputStream outStream = new ObjectOutputStream(s.getOutputStream());
+
+                ObjectInputStream inStream = new ObjectInputStream(s.getInputStream());
 
                 Vector<String> operationRequest = new Vector<>();
                 operationRequest.add("remove");
@@ -150,17 +185,22 @@ public class EmailClient {
 
                 outStream.writeObject(user);
 
-                result = true;
-            }finally{
+                response = (String) inStream.readObject();
+
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+
+                response = "server_error";
+            } finally{
                 s.close();
             }
 
         } catch (IOException e) {
             e.printStackTrace();
 
-            result = false;
+            response = "server_error";
         }
-        return result;
+        return response;
     }
 
     public void serverLogout(User user){
@@ -178,7 +218,9 @@ public class EmailClient {
 
                 outStream.writeObject(user);
 
-            }finally{
+            }catch (IOException e){
+                e.printStackTrace();
+            } finally{
                 s.close();
             }
 

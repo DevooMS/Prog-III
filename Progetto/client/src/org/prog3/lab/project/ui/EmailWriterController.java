@@ -4,8 +4,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
-import javafx.stage.Stage;
-import org.prog3.lab.project.model.EmailClient;
 import org.prog3.lab.project.model.EmailWriter;
 import org.prog3.lab.project.model.User;
 
@@ -34,18 +32,14 @@ public class EmailWriterController {
 
 
     private EmailWriter modelWriter;
-    //private EmailClient modelClient;
-    //private StringProperty emailAddress;
     private User user;
-    private Stage writeStage;
 
     @FXML
-    public void initialize(Stage writeStage, User user, String to, String object, String text){
+    public void initialize(User user, String to, String object, String text){
         if (this.modelWriter != null)
             throw new IllegalStateException("Model can only be initialized once");
 
         this.modelWriter = new EmailWriter();
-        this.writeStage = writeStage;
         this.user = user;
 
         if(to!=null && object!=null && text!=null){
@@ -66,19 +60,23 @@ public class EmailWriterController {
     private void btnSendClick(ActionEvent actionEvent) {
         String response = modelWriter.serverSendEmail(user/*emailAddress*/, textReceivers.getText(), textObject.getText(), textEmail.getText());
 
-        if(response.equals("send_error")){
-            labelSendResult.setText("Errore durante l'invio. Riprovare.");
-            labelSendResult.setStyle("-fx-text-fill: red");
-            labelSendResult.setVisible(true);
-        } else if(response.equals("server_error")){
-            labelSendResult.setText("Errore di comunicazione con il server. Riprovare.");
-            labelSendResult.setStyle("-fx-text-fill: red");
-            labelSendResult.setVisible(true);
-        } else if(response.equals("send_correct")){
-            labelSendResult.setText("Email inviata correttamente.");
-            labelSendResult.setStyle("-fx-text-fill: green");
-            labelSendResult.setVisible(true);
-            btnSend.setDisable(true);
+        switch (response) {
+            case "send_error" -> {
+                labelSendResult.setText("Errore durante l'invio. Riprovare.");
+                labelSendResult.setStyle("-fx-text-fill: red");
+                labelSendResult.setVisible(true);
+            }
+            case "server_error" -> {
+                labelSendResult.setText("Errore di comunicazione con il server. Riprovare.");
+                labelSendResult.setStyle("-fx-text-fill: red");
+                labelSendResult.setVisible(true);
+            }
+            case "send_correct" -> {
+                labelSendResult.setText("Email inviata correttamente.");
+                labelSendResult.setStyle("-fx-text-fill: green");
+                labelSendResult.setVisible(true);
+                btnSend.setDisable(true);
+            }
         }
     }
 

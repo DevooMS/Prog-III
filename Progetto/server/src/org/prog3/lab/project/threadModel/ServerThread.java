@@ -1,6 +1,5 @@
 package org.prog3.lab.project.threadModel;
 
-import org.prog3.lab.project.model.Server;
 import org.prog3.lab.project.model.User;
 
 import java.io.IOException;
@@ -17,26 +16,30 @@ import java.util.concurrent.TimeUnit;
 public class ServerThread implements Runnable{
 
     private static final int NUM_THREAD = 3;
-    Semaphore loginSem;
-    Semaphore logoutSem;
-    Semaphore connectionSem;
-    Semaphore sendSem;
-    Semaphore receivedSem;
+    private final Semaphore loginSem;
+    private final Semaphore logoutSem;
+    private final Semaphore connectionSem;
+    private final Semaphore sendSem;
+    private final Semaphore errorSendSem;
+    private final Semaphore receivedSem;
+    private final Semaphore removeSem;
+    private User user;
 
-    public ServerThread(Semaphore loginSem, Semaphore logoutSem, Semaphore connectionSem, Semaphore sendSem, Semaphore receivedSem){
+    public ServerThread(Semaphore loginSem, Semaphore logoutSem, Semaphore connectionSem, Semaphore sendSem, Semaphore errorSendSem, Semaphore receivedSem, Semaphore removeSem){
         this.loginSem = loginSem;
         this.logoutSem = logoutSem;
         this.connectionSem = connectionSem;
         this.sendSem = sendSem;
+        this.errorSendSem = errorSendSem;
         this.receivedSem = receivedSem;
+        this.removeSem = removeSem;
     }
 
     @Override
     public void run(){
         try {
             ServerSocket s = new ServerSocket(8190);
-            ExecutorService loginThreads = Executors.newFixedThreadPool(NUM_THREAD);
-            ExecutorService logoutThreads = Executors.newFixedThreadPool(NUM_THREAD);
+            ExecutorService accessThreads = Executors.newFixedThreadPool(NUM_THREAD);
             ExecutorService updateThreads = Executors.newFixedThreadPool(NUM_THREAD);
             ExecutorService sendThreads = Executors.newFixedThreadPool(NUM_THREAD);
             ExecutorService removeThreads = Executors.newFixedThreadPool(NUM_THREAD);
@@ -51,8 +54,6 @@ public class ServerThread implements Runnable{
                     ObjectOutputStream outStream = new ObjectOutputStream(incoming.getOutputStream());
                     ObjectInputStream inStream = new ObjectInputStream(incoming.getInputStream());
 
-                    User user = null;
-
                     Vector<String> v = null;
 
                     try {
@@ -66,74 +67,64 @@ public class ServerThread implements Runnable{
                     if (v != null)
                         operation = v.get(0);
 
+                    if(operation.equals("login") || operation.equals("logout") || operation.equals("update") || operation.equals("send") || operation.equals("remove")){
+                        try {
+                            user = (User) inStream.readObject();
+                        } catch (ClassNotFoundException e) {
+                            System.out.println(e.getMessage());
+                        }
+                    }
+
                     String path;
 
                     switch (operation) {
-                        case "login":
-                            path = "./server/src/org/prog3/lab/project/resources/userEmails.txt";
-                            Runnable loginTask = new LoginTask(v.get(1), v.get(2), loginSem, connectionSem, logThreads,  path, outStream);
-                            loginThreads.execute(loginTask);
-                            break;
-                        case "logout":
-                            try {
-                                user = (User) inStream.readObject();
-                            } catch (ClassNotFoundException e) {
-                                System.out.println(e.getMessage());
-                            }
-                            Runnable logoutTask = new LogoutTask(user, logoutSem, connectionSem, logThreads);
-                            logoutThreads.execute(logoutTask);
-                            break;
-                        case "update":
-                            //path = "./server/src/org/prog3/lab/project/resources/userClients/"+v.get(1)+"/"+v.get(2);
-                            try {
-                                user = (User) inStream.readObject();
-                            } catch (ClassNotFoundException e) {
-                                System.out.println(e.getMessage());
-                            }
-                            path = "./server/src/org/prog3/lab/project/resources/userClients/"+user.getUserEmail()+"/"+v.get(1);
+                        case "login" -> {
+                            path = getClass().getResource("../resources/log/login/" + user.getUserEmail()).getPath();
+                            //path = "./server/src/org/prog3/lab/project/resources/log/login/" + user.getUserEmail();
+                            Runnable loginTask = new AccessTask(user, connectionSem, loginSem, logThreads, "login", path);
+                            accessThreads.execute(loginTask);
+                        }
+                        case "logout" -> {
+                            path = getClass().getResource("../resources/log/logout/" + user.getUserEmail()).getPath();
+                            //path = "./server/src/org/prog3/lab/project/resources/log/logout/" + user.getUserEmail();
+                            Runnable logoutTask = new AccessTask(user, connectionSem, logoutSem, logThreads, "logout", path);
+                            accessThreads.execute(logoutTask);
+                        }
+                        case "update" -> {
+                            if(v.get(1).equals("sendedEmails"))
+                                path = getClass().getResource("../userClients/" + user.getUserEmail() + "/sendedEmails").getPath();
+                            else
+                                path = getClass().getResource("../userClients/" + user.getUserEmail() + "/receivedEmails").getPath();
+
                             Runnable updateTask = new UpdateTask(user, connectionSem, logThreads, path, Boolean.parseBoolean(v.get(2)), outStream);
-                            //System.out.println(v.get(3));
                             updateThreads.execute(updateTask);
-                            break;
-                        case "send":
-                            try {
-                                user = (User) inStream.readObject();
-                            } catch (ClassNotFoundException e) {
-                                System.out.println(e.getMessage());
-                            }
-                            path = "./server/src/org/prog3/lab/project/resources/userClients/"+user.getUserEmail()+"/sendedEmails/";
-                            Runnable sendTask = new SendTask(connectionSem, sendSem, receivedSem, logThreads, path, user, v.get(1), v.get(2), v.get(3), outStream);
+                        }
+                        case "send" -> {
+                            path = getClass().getResource("../userClients/" + user.getUserEmail() + "/sendedEmails/").getPath();
+                            //path = "./server/src/org/prog3/lab/project/resources/userClients.userClients/" + user.getUserEmail() + "/sendedEmails/";
+                            Runnable sendTask = new SendTask(connectionSem, sendSem, errorSendSem, receivedSem, logThreads, path, user, v.get(1), v.get(2), v.get(3), outStream);
                             sendThreads.execute(sendTask);
-                            break;
-                        case "remove":
-                            try {
-                                user = (User) inStream.readObject();
-                            } catch (ClassNotFoundException e) {
-                                System.out.println(e.getMessage());
-                            }
-                            path = "./server/src/org/prog3/lab/project/resources/userClients/"+user.getUserEmail()+"/"+v.get(1)+"/"+v.get(2);
-                            Runnable removeTask = new RemoveTask(user, connectionSem, logThreads, path);
+                        }
+                        case "remove" -> {
+                            path = getClass().getResource("/" + user.getUserEmail() + "/" + v.get(1) + "/" + v.get(2)).getPath();
+                            //path = "./server/src/org/prog3/lab/project/resources/userClients.userClients/" + user.getUserEmail() + "/" + v.get(1) + "/" + v.get(2);
+                            Runnable removeTask = new RemoveTask(user, connectionSem, removeSem, logThreads, path, outStream);
                             removeThreads.execute(removeTask);
-                            break;
-                        case "terminate":
-                            accept=false;
-                            //s.close();
-                            loginThreads.shutdown();
-                            loginThreads.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
+                        }
+                        case "terminate" -> {
+                            accept = false;
+                            accessThreads.shutdown();
+                            accessThreads.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
                             updateThreads.shutdown();
                             updateThreads.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
                             sendThreads.shutdown();
                             sendThreads.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
                             removeThreads.shutdown();
                             removeThreads.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
-                            logoutThreads.shutdown();
-                            logoutThreads.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
                             logThreads.shutdown();
                             logThreads.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
-                            break;
-                        default:
-                            new IOException();
-                            break;
+                        }
+                        default -> new IOException();
                     }
                 }
             } catch (InterruptedException e) {

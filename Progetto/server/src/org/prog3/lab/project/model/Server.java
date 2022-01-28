@@ -2,14 +2,10 @@ package org.prog3.lab.project.model;
 
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.concurrent.Semaphore;
 
 public class Server {
@@ -19,12 +15,16 @@ public class Server {
     private final ListProperty<String> listConnectionProperty;
     private final ObservableList<String> listSend;
     private final ListProperty<String> listSendProperty;
+    private final ObservableList<String> listErrorSend;
+    private final ListProperty<String> listErrorSendProperty;
     private final ObservableList<String> listReceived;
     private final ListProperty<String> listReceivedProperty;
     private final ObservableList<String> listLogin;
     private final ListProperty<String> listLoginProperty;
     private final ObservableList<String> listLogout;
     private final ListProperty<String> listLogoutProperty;
+    private final ObservableList<String> listRemove;
+    private final ListProperty<String> listRemoveProperty;
 
     public Server(){
         this.listClients = FXCollections.observableArrayList();
@@ -35,6 +35,9 @@ public class Server {
         this.listConnectionProperty.set(listConnection);
         this.listSend = FXCollections.observableArrayList();
         this.listSendProperty = new SimpleListProperty<>();
+        this.listErrorSend = FXCollections.observableArrayList();
+        this.listErrorSendProperty = new SimpleListProperty<>();
+        this.listErrorSendProperty.set(listErrorSend);
         this.listSendProperty.set(listSend);
         this.listReceived = FXCollections.observableArrayList();
         this.listReceivedProperty = new SimpleListProperty<>();
@@ -45,6 +48,9 @@ public class Server {
         this.listLogout = FXCollections.observableArrayList();
         this.listLogoutProperty = new SimpleListProperty<>();
         this.listLogoutProperty.set(listLogout);
+        this.listRemove = FXCollections.observableArrayList();
+        this.listRemoveProperty = new SimpleListProperty<>();
+        this.listRemoveProperty.set(listRemove);
     }
 
     public ListProperty<String> listClientsProperty(){ return listClientsProperty;}
@@ -53,11 +59,15 @@ public class Server {
 
     public ListProperty<String> listSendProperty(){ return listSendProperty;}
 
+    public ListProperty<String> listErrorSendProperty(){ return listErrorSendProperty;}
+
     public ListProperty<String> listReceivedProperty(){ return listReceivedProperty;}
 
     public ListProperty<String> listLoginProperty(){ return listLoginProperty;}
 
     public ListProperty<String> listLogoutProperty(){ return listLogoutProperty;}
+
+    public ListProperty<String> listRemoveProperty(){ return listRemoveProperty;}
 
     public void addUser(String filePath){
         BufferedReader reader = null;
@@ -67,16 +77,12 @@ public class Server {
             e.printStackTrace();
         }
 
-        String line = null;
-
         try {
-            line = reader.readLine();
+            String user = reader.readLine();
 
-            while (line != null) {
-                int pos = line.indexOf('-');
-                String lineClient = line.substring(0,pos);
-                listClients.add(lineClient);
-                line = reader.readLine();
+            while (user != null) {
+                listClients.add(user);
+                user = reader.readLine();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -87,7 +93,7 @@ public class Server {
         boolean ris = false;
         try {
             connectionSem.acquire();
-            ris =  showLog(listConnection, "./server/src/org/prog3/lab/project/resources/log/connection/" + user);
+            ris =  showLog(listConnection, getClass().getResource("../resources/log/connection/" + user).getPath());
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
@@ -102,7 +108,22 @@ public class Server {
 
         try{
             sendSem.acquire();
-            ris = showLog(listSend, "./server/src/org/prog3/lab/project/resources/log/send/"+user);
+            ris = showLog(listSend, getClass().getResource("../resources/log/send/" + user).getPath());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            sendSem.release();
+        }
+
+        return ris;
+    }
+
+    public boolean showLogErrorSend(String user, Semaphore sendSem){
+        boolean ris = false;
+
+        try{
+            sendSem.acquire();
+            ris = showLog(listErrorSend, getClass().getResource("../resources/log/errorSend/" + user).getPath());
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
@@ -117,7 +138,7 @@ public class Server {
 
         try{
             receivedSem.acquire();
-            ris = showLog(listReceived, "./server/src/org/prog3/lab/project/resources/log/received/"+user);
+            ris = showLog(listReceived, getClass().getResource("../resources/log/received/" + user).getPath());
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
@@ -132,7 +153,7 @@ public class Server {
 
         try{
             loginSem.acquire();
-            ris = showLog(listLogin,"./server/src/org/prog3/lab/project/resources/log/login/"+user);
+            ris = showLog(listLogin, getClass().getResource("../resources/log/login/" + user).getPath());
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
@@ -147,11 +168,26 @@ public class Server {
 
         try{
             logoutSem.acquire();
-            ris = showLog(listLogout,"./server/src/org/prog3/lab/project/resources/log/logout/"+user);
+            ris = showLog(listLogout, getClass().getResource("../resources/log/logout/" + user).getPath());
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
             logoutSem.release();
+        }
+
+        return ris;
+    }
+
+    public boolean showLogRemove(String user, Semaphore removeSem){
+        boolean ris = false;
+
+        try{
+            removeSem.acquire();
+            ris = showLog(listRemove,getClass().getResource("../resources/log/remove/" + user).getPath());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            removeSem.release();
         }
 
         return ris;
@@ -168,10 +204,8 @@ public class Server {
             e.printStackTrace();
         }
 
-        String line = null;
-
         try {
-            line = reader.readLine();
+            String line = reader.readLine();
 
             while (line != null) {
                 if(!line.equals("")) {

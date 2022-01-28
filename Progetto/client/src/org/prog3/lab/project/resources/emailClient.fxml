@@ -24,15 +24,7 @@
                <children>
                   <StackPane minWidth="-Infinity" prefHeight="599.2" prefWidth="450.4" AnchorPane.bottomAnchor="430.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <Label fx:id="labelConnectionError" text="Errore di connessione con il server" textFill="#f00000" visible="false" StackPane.alignment="TOP_CENTER">
-                           <font>
-                              <Font size="18.0" />
-                           </font>
-                           <StackPane.margin>
-                              <Insets top="10.0" />
-                           </StackPane.margin>
-                        </Label>
-                        <Label fx:id="labelAccountName" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="453.0" text="Nome di prova" textAlignment="CENTER" AnchorPane.bottomAnchor="430.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" StackPane.alignment="TOP_CENTER">
+                        <Label fx:id="labelAccountName" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="453.0" textAlignment="CENTER" AnchorPane.bottomAnchor="430.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" StackPane.alignment="TOP_CENTER">
                            <font>
                               <Font name="Arial" size="18.0" />
                            </font>
@@ -50,20 +42,28 @@
                         </ImageView>
                         <Button fx:id="btnNewEmail" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="34.0" prefWidth="175.0" text="Scrivi email" StackPane.alignment="TOP_CENTER">
                            <StackPane.margin>
-                              <Insets left="175.0" top="60.0" />
+                              <Insets left="175.0" top="67.0" />
                            </StackPane.margin>
                         </Button>
                         <Button fx:id="btnUpdate" alignment="CENTER" mnemonicParsing="false" prefHeight="33.0" prefWidth="105.0" text="Update" StackPane.alignment="TOP_CENTER">
                            <StackPane.margin>
-                              <Insets left="175.0" top="100.0" />
+                              <Insets left="175.0" top="110.0" />
                            </StackPane.margin>
                         </Button>
-                        <Label fx:id="labelError" text="Errore di connessione con il server." visible="false" StackPane.alignment="TOP_CENTER">
+                        <Label fx:id="onlineLabel" text="online" textFill="#01bc1d" StackPane.alignment="TOP_CENTER">
                            <font>
                               <Font size="15.0" />
                            </font>
                            <StackPane.margin>
-                              <Insets left="175.0" top="140.0" />
+                              <Insets left="175.0" top="40.0" />
+                           </StackPane.margin>
+                        </Label>
+                        <Label fx:id="offlineLabel" text="offline" textFill="#f40505" StackPane.alignment="TOP_CENTER">
+                           <font>
+                              <Font size="15.0" />
+                           </font>
+                           <StackPane.margin>
+                              <Insets left="175.0" top="40.0" />
                            </StackPane.margin>
                         </Label>
                      </children>

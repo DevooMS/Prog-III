@@ -1,6 +1,8 @@
 package org.prog3.lab.project.model;
 
-public class Email {
+import java.io.Serializable;
+
+public class Email implements Serializable{
 
     private final String id;
     private final String type;
@@ -43,7 +45,6 @@ public class Email {
     public String getDate() {
         return date;
     }
-
 
     public String getText() {
         return text;
