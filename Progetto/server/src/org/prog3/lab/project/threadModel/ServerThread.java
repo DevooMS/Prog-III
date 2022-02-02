@@ -91,24 +91,20 @@ public class ServerThread implements Runnable{
                             accessThreads.execute(logoutTask);
                         }
                         case "update" -> {
-                            if(v.get(1).equals("sendedEmails"))
-                                path = getClass().getResource("../userClients/" + user.getUserEmail() + "/sendedEmails").getPath();
-                            else
-                                path = getClass().getResource("../userClients/" + user.getUserEmail() + "/receivedEmails").getPath();
-
+                            path = getClass().getResource("../resources/userClients/" + user.getUserEmail() + "/" + v.get(1)).getPath();
                             Runnable updateTask = new UpdateTask(user, connectionSem, logThreads, path, Boolean.parseBoolean(v.get(2)), outStream);
                             updateThreads.execute(updateTask);
                         }
                         case "send" -> {
-                            path = getClass().getResource("../userClients/" + user.getUserEmail() + "/sendedEmails/").getPath();
+                            path = getClass().getResource("../resources/userClients/" + user.getUserEmail() + "/sendedEmails/").getPath();
                             //path = "./server/src/org/prog3/lab/project/resources/userClients.userClients/" + user.getUserEmail() + "/sendedEmails/";
                             Runnable sendTask = new SendTask(connectionSem, sendSem, errorSendSem, receivedSem, logThreads, path, user, v.get(1), v.get(2), v.get(3), outStream);
                             sendThreads.execute(sendTask);
                         }
                         case "remove" -> {
-                            path = getClass().getResource("/" + user.getUserEmail() + "/" + v.get(1) + "/" + v.get(2)).getPath();
+                            path = getClass().getResource("../resources/userClients/" + user.getUserEmail() + "/" + v.get(1) + "/").getPath();
                             //path = "./server/src/org/prog3/lab/project/resources/userClients.userClients/" + user.getUserEmail() + "/" + v.get(1) + "/" + v.get(2);
-                            Runnable removeTask = new RemoveTask(user, connectionSem, removeSem, logThreads, path, outStream);
+                            Runnable removeTask = new RemoveTask(user, connectionSem, removeSem, logThreads, path, v.get(2), outStream);
                             removeThreads.execute(removeTask);
                         }
                         case "terminate" -> {

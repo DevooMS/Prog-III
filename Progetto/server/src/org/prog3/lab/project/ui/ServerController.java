@@ -27,6 +27,9 @@ public class ServerController {
     private Button btnLogoff;
 
     @FXML
+    private Button btnUpdate;
+
+    @FXML
     private Label labelInfo;
 
     @FXML
@@ -119,6 +122,8 @@ public class ServerController {
 
         btnLogoff.setOnAction(this::btnLogOffClick);
 
+        btnUpdate.setOnAction(this::btnUpdateClick);
+
         stage.setOnCloseRequest(this::stageClose);
 
         model.addUser(getClass().getResource("../resources/userEmails").getPath());
@@ -127,6 +132,8 @@ public class ServerController {
     private void btnLogOffClick(ActionEvent actionEvent) {
         serverLogOff();
     }
+
+    private void btnUpdateClick(ActionEvent actionEvent) { updateLogForType(); }
 
     private void stageClose(WindowEvent windowEvent) {
         serverLogOff();

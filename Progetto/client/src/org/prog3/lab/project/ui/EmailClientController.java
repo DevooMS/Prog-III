@@ -268,12 +268,17 @@ public class EmailClientController {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setHeaderText(null);
                 alert.setTitle("Errore durante la rimozione");
-                alert.setContentText("Impossibile eliminare la mail selezionata");
+                alert.setContentText("Impossibile eliminare la mail selezionata al momento");
                 alert.showAndWait();
             }
             case "server_error" -> {
                 onlineLabel.setVisible(false);
                 offlineLabel.setVisible(true);
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setHeaderText(null);
+                alert.setTitle("Errore durante la rimozione");
+                alert.setContentText("Errore di comunicazione con il server. Riprovare più tardi.");
+                alert.showAndWait();
             }
         }
     }

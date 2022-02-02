@@ -107,8 +107,6 @@ public class SendTask implements Runnable{
                 }
             }
 
-            outStream.close();
-
             logDate = logDateFormatter.format(LocalDateTime.now());
 
             logThreads.execute(new LogTask(connectionSem, getClass().getResource("../resources/log/connection/" + user.getUserEmail()).getPath(), "close send connection", logDate));
@@ -121,6 +119,8 @@ public class SendTask implements Runnable{
         } finally {
             try {
                 outStream.writeObject(response);
+
+                outStream.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -143,7 +143,9 @@ public class SendTask implements Runnable{
             else
                 receiver = receivers.substring(start);
 
-            File folder = new File(getClass().getResource("/" + receiver).getPath());
+            String user_folder_path = getClass().getResource("../resources/userClients/").getPath();
+
+            File folder = new File( user_folder_path + "/" + receiver);
 
             if(receiver.equals(user.getUserEmail()) || !folder.isDirectory()){
                 wrongAddress += receiver + " ";
@@ -153,9 +155,6 @@ public class SendTask implements Runnable{
 
             start = end+1;
         }
-
-        for(int i=0; i<listReceivers.size(); i++)
-            System.out.println(listReceivers.get(i));
     }
 
     private void writeFile(String text, boolean isTextEmail, PrintWriter out){
@@ -177,10 +176,13 @@ public class SendTask implements Runnable{
 
         for (int i = 0; i < listReceivers.size(); i++) {
 
-            //File file_receiver = new File(getClass().getResource("../resources/userClients.userClients/" + listReceivers.get(i) + "/receivedEmails/" + file_send.getName() + "_" + user.getUserEmail() + ".txt").getPath());
-            File file_receiver = new File("../src/org/prog3/lab/project/userClients/" + listReceivers.get(i) + "/receivedEmails/" + file_send.getName() + "_" + user.getUserEmail() + ".txt");
-            //if(file_receiver.createNewFile()) {
-            file_receiver.createNewFile();
+
+            String file_receiver_path = getClass().getResource("../resources/userClients/" + listReceivers.get(i) + "/receivedEmails/").getPath();
+            File file_receiver = new File(file_receiver_path + file_send.getName() + "_" + user.getUserEmail() + ".txt");
+
+            if(file_receiver.createNewFile()) {
+
+                file_receiver.createNewFile();
                 FileChannel from = new FileInputStream(file_send).getChannel();
                 FileChannel receiver = new FileOutputStream(file_receiver).getChannel();
 
@@ -193,27 +195,29 @@ public class SendTask implements Runnable{
 
                 logThreads.execute(new LogTask(receivedSem, getClass().getResource("../resources/log/received/" + listReceivers.get(i)).getPath(), "received email", logDate));
 
-            /*}else{
+            }else{
                 logDate = logDateFormatter.format(LocalDateTime.now());
 
-                logThreads.execute(new LogTask(errorSendSem, getClass().getResource("../resources/log/errorSend/" + user.getUserEmail()).getPath(), "send to wrong address", logDate));
+                logThreads.execute(new LogTask(errorSendSem, getClass().getResource("../resources/log/errorSend/" + user.getUserEmail()).getPath(), "error send to receiver", logDate));
 
-            }*/
+            }
         }
 
         if(wrongAddress.length() > 0){
 
             logDate = logDateFormatter.format(LocalDateTime.now());
 
-            logThreads.execute(new LogTask(errorSendSem, getClass().getResource("../resources/log/errorSend/" + user.getUserEmail()).getPath(), "error send to receiver", logDate));
+            logThreads.execute(new LogTask(errorSendSem, getClass().getResource("../resources/log/errorSend/" + user.getUserEmail()).getPath(), "send to wrong address", logDate));
 
             wrongAddress = wrongAddress.replace(" ", "\n");
 
             fileDate = fileDateFormatter.format(LocalDateTime.now());
 
+            String sender_path = getClass().getResource("../resources/userClients/" +user.getUserEmail()+"/receivedEmails/").getPath();
+
             File file_error;
 
-            file_error = new File(getClass().getResource("/" +user.getUserEmail()+"/receivedEmails/"+fileDate+"_error.txt").getPath());
+            file_error = new File(sender_path + fileDate + "_error.txt");
 
             PrintWriter out = new PrintWriter(file_error);
 

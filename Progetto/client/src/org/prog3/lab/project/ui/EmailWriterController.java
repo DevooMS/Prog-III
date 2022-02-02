@@ -67,7 +67,7 @@ public class EmailWriterController {
                 labelSendResult.setVisible(true);
             }
             case "server_error" -> {
-                labelSendResult.setText("Errore di comunicazione con il server. Riprovare.");
+                labelSendResult.setText("Errore di comunicazione con il server. Riprovare più tardi.");
                 labelSendResult.setStyle("-fx-text-fill: red");
                 labelSendResult.setVisible(true);
             }

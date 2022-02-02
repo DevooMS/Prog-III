@@ -16,15 +16,17 @@ public class RemoveTask implements Runnable {
     private final Semaphore removeSem;
     private final ExecutorService logThreads;
     private final String path;
+    private final String file_name;
     private final ObjectOutputStream outStream;
     private final DateTimeFormatter logDateFormatter;
 
-    public RemoveTask(User user, Semaphore conncectionSem, Semaphore removeSem, ExecutorService logThreads, String path, ObjectOutputStream outStream) {
+    public RemoveTask(User user, Semaphore conncectionSem, Semaphore removeSem, ExecutorService logThreads, String path, String file_name, ObjectOutputStream outStream) {
         this.user = user;
         this.connectionSem = conncectionSem;
         this.removeSem = removeSem;
         this.logThreads = logThreads;
         this.path = path;
+        this.file_name = file_name;
         this.outStream = outStream;
         logDateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
     }
@@ -37,7 +39,7 @@ public class RemoveTask implements Runnable {
         try {
             user.getReadWrite().acquire();
 
-            File file_remove = new File(path);
+            File file_remove = new File(path + file_name);
 
             String response;
 

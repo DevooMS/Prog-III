@@ -120,7 +120,6 @@ public class UpdateTask implements Runnable{
                     reader.close();
 
                     if (rewrite) {
-                        //FileWriter fstreamWrite = new FileWriter(path + "/" + listOfFiles[i].getName());
                         FileWriter fstreamWrite = new FileWriter(path + "/" + listOfFiles[i].getName());
                         BufferedWriter out = new BufferedWriter(fstreamWrite);
                         out.write(fileContent.toString());
