@@ -14,11 +14,11 @@ public class EmailClientMain extends Application {
     @Override
     public void start(Stage stage) throws Exception {
 
-        FXMLLoader loaderEmailClient = new FXMLLoader(getClass().getResource("../resources/emailClient.fxml"));
-        Scene scene = new Scene(loaderEmailClient.load());
+        FXMLLoader loaderEmailClient = new FXMLLoader(getClass().getResource("../resources/emailClient.fxml")); //carico il file fxml
+        Scene scene = new Scene(loaderEmailClient.load());                  //scena nuova
         EmailClientController emailClientController = loaderEmailClient.getController();
         emailClientController.initialize(user, stage);                     //faccio partire il controller di EmailClientController.java
-        stage.setTitle("Email client");
+        stage.setTitle("Email client");                                    //imposto la grandezza il titolo
         stage.setScene(scene);
         stage.setMinWidth(950);
         stage.setMinHeight(650);
@@ -28,10 +28,10 @@ public class EmailClientMain extends Application {
 
     }
 
-    public static void main(String[] args) {
-        user = new User(args[0]);
+    public static void main(String[] args) {                                
+        user = new User(args[0]);       //#?
 
-        launch();
+        launch();                       //#?
     }
 
 }

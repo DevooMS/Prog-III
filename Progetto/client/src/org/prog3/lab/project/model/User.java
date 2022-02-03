@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.concurrent.Semaphore;
 
-public class User implements Serializable {
+public class User implements Serializable {    //Serializazble server per preparare i dati per poi essere inviato sul network
     private final String userEmail;
     private final Semaphore readWrite;
     private final ArrayList<Email> receivedEmails;
@@ -26,15 +26,15 @@ public class User implements Serializable {
         return readWrite;
     }
 
-    public ArrayList<Email> getReceivedEmails() {
+    public ArrayList<Email> getReceivedEmails() {       //lista di email ricevuti
         return receivedEmails;
     }
 
-    public ArrayList<Email> getSendedEmails() {
+    public ArrayList<Email> getSendedEmails() {         //lista di email inviati
         return sendedEmails;
     }
 
-    public void addReceivedEmail(Email email) {
+    public void addReceivedEmail(Email email) {         //aggiungo alla arraylist e faccio il sort
         receivedEmails.add(email);
         sortList(receivedEmails);
     }

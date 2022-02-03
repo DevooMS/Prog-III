@@ -18,23 +18,23 @@ public class EmailWriter {
 
             try {
 
-                ObjectOutputStream outStream = new ObjectOutputStream(s.getOutputStream());
+                ObjectOutputStream outStream = new ObjectOutputStream(s.getOutputStream());      //apro un socket in uscita
 
-                ObjectInputStream inStream = new ObjectInputStream(s.getInputStream());
+                ObjectInputStream inStream = new ObjectInputStream(s.getInputStream());            //apro un socke in entrata
 
-                Vector<String> operationRequest = new Vector<>();
+                Vector<String> operationRequest = new Vector<>();                                   //faccio un vector  e aggiungo le operazioni add oggetto receivers object e testo
                 operationRequest.add("send");
                 operationRequest.add(receivers);
                 operationRequest.add(object);
                 operationRequest.add(text);
 
-                outStream.writeObject(operationRequest);
+                outStream.writeObject(operationRequest);                                            //invio la richiesta a operationRequest
 
-                outStream.writeObject(user);
+                outStream.writeObject(user);                                                        //invio a user
 
-                response = (String) inStream.readObject();
+                response = (String) inStream.readObject();                                          //leggo la risposta 
 
-            }catch (IOException | ClassNotFoundException e){
+            }catch (IOException | ClassNotFoundException e){            
                 e.printStackTrace();
                 response ="server_error";
             }finally{

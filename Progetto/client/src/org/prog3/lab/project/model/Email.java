@@ -2,7 +2,7 @@ package org.prog3.lab.project.model;
 
 import java.io.Serializable;
 
-public class Email implements Serializable{
+public class Email implements Serializable{ //Serializazble server per preparare i dati per poi essere inviato sul network
 
     private final String id;
     private final String type;
@@ -14,11 +14,11 @@ public class Email implements Serializable{
 
     public Email(String id, String type, String sender, String receivers, String object, String date, String text){
         this.id = id;
-        this.type = type;
+        this.type = type;               //il type indica l'operazione che vado eseguire che puo essere sendedEmail oppure recivedEmail
         this.sender = sender;
         this.receivers = receivers;
         this.object = object;
-        this.date = date;
+        this.date = date;               //data usato per ordinare le date all' interno della lista
         this.text = text;
     }
 
