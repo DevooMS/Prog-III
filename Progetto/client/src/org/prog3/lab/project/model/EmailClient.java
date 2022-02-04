@@ -55,8 +55,8 @@ public class EmailClient {
         }
     }
 
-    public String deleteEmail(User user, Email email) {
-        String response = serverRemoveEmail(user, email.getType(), email.getId());
+    public String deleteEmail(User user, Email email) {                             //chimatao da btnDelete
+        String response = serverRemoveEmail(user, email.getType(), email.getId());   //chiama serverRemoveEmail e apre un socket
 
         if(response.equals("remove_correct")) {
             if (email.getType().equals("receivedEmails")) {
@@ -73,7 +73,7 @@ public class EmailClient {
         return response;
     }
 
-    public int updateEmailslists(User user, boolean updateSended, boolean startUpdate) {
+    public int updateEmailslists(User user, boolean updateSended, boolean startUpdate) {     //aggiorna email con il serverRequestUpdateList socket
 
         int countNewEmails;
 
