@@ -107,9 +107,9 @@ public class EmailClientController {
         labelAccountName.setText(user.getUserEmail());          //Prendo il labelAcc.. E accedo al textProperty e faccio il bind al nostro property|| ogni volta che si modifica model mi modifica anche listReceiv e modifica in tempo reale il view di questo label
         listReceivedEmails.itemsProperty().bind(model.receivedEmailsProperty());     //stessa cosa per le listReceivedEmails il bind cambia i dati la view cambia quando i dati sono cambiati
         listReceivedEmails.setOnMouseClicked(this::showSelectReceivedEmail);         //chiamo la funzione showSelectRecivedEmail alla pressione del mouse
-        listSendedEmails.itemsProperty().bind(model.sendedEmailsProperty());
+        listSendedEmails.itemsProperty().bind(model.sendedEmailsProperty());         //#?
         listSendedEmails.setOnMouseClicked(this::showSelectSendedEmail);
-        btnReply.setOnAction(this::btnReplyClick);
+        btnReply.setOnAction(this::btnReplyClick);                                  //sono i relativi bottoni che chiamano i relativi funzioni
         btnReplyAll.setOnAction(this::btnReplyAllClick);
         btnForward.setOnAction(this::btnForwardClick);
         btnNewEmail.setOnAction(this::btnNewEmailClick);

@@ -11,7 +11,7 @@ public class User implements Serializable {    //Serializazble server per prepar
     private final ArrayList<Email> receivedEmails;
     private final ArrayList<Email> sendedEmails;
 
-    public User(String userEmail) {
+    public User(String userEmail) {     //creato da Email dove gli passa argument come indirizzo email
         this.userEmail = userEmail;
         this.readWrite = new Semaphore(1);
         receivedEmails = new ArrayList<>();
