@@ -89,7 +89,7 @@ public class EmailClientController {
     private Timeline emailUpdate;
 
     @FXML
-    public void initialize(User user, Stage stage) {
+    public void initialize(User user, Stage stage) {   //chiamato da Email.java emailClientController.initialize
         if (this.model != null)
             throw new IllegalStateException("Model can only be initialized once");
 

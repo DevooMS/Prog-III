@@ -19,7 +19,7 @@ public class Email implements Serializable{ //Serializazble server per preparare
         this.receivers = receivers;
         this.object = object;
         this.date = date;               //data usato per ordinare le date all' interno della lista
-        this.text = text;
+        this.text = text;               //contenuto        
     }
 
     public String getId() {

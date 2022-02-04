@@ -13,21 +13,21 @@ import java.util.*;
 public class EmailClient {
     private final ObservableList<Email> listReceivedEmails;    //gli salvo dentro la lista di email da email.java utilizza Observer e Property per fare il bind
     private final ObservableList<Email> listSendedEmails;      //e una colezione oservabile di Email
-    private final ListProperty<Email> sendedEmailsProperty;
+    private final ListProperty<Email> sendedEmailsProperty;     //
     private final ListProperty<Email> receivedEmailsProperty;
 
     public EmailClient(){
-        this.listReceivedEmails = FXCollections.observableArrayList();       //creo un Observable List
+        this.listReceivedEmails = FXCollections.observableArrayList();       //creo un Observable List per listReceivedEmails
         this.receivedEmailsProperty = new SimpleListProperty<>();           //creo un SimpleList
-        this.receivedEmailsProperty.set(listReceivedEmails);                //PropertyList dentro quale ho un Observable List
+        this.receivedEmailsProperty.set(listReceivedEmails);               //PropertyList dentro quale ho un Observable List di listReceivedEmails
         this.listSendedEmails = FXCollections.observableArrayList();     //creo un Observable List
-        this.sendedEmailsProperty = new SimpleListProperty<>();
-        this.sendedEmailsProperty.set(listSendedEmails);
+        this.sendedEmailsProperty = new SimpleListProperty<>(); 
+        this.sendedEmailsProperty.set(listSendedEmails);                  //faccio la stessa cosa per listSendedEmails
     }
 
-    public ListProperty<Email> receivedEmailsProperty(){ return receivedEmailsProperty;}
+    public ListProperty<Email> receivedEmailsProperty(){ return receivedEmailsProperty;}   //restituisce receivedEmails
 
-    public ListProperty<Email> sendedEmailsProperty(){ return sendedEmailsProperty;}
+    public ListProperty<Email> sendedEmailsProperty(){ return sendedEmailsProperty;}        //restituisce sendedEmails
 
     public void serverLogin(User user){
         try {

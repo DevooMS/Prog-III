@@ -29,9 +29,9 @@ public class EmailClientMain extends Application {
     }
 
     public static void main(String[] args) {                                
-        user = new User(args[0]);       //#?
+        user = new User(args[0]);       //#? fa un oggetto user gli passa useremail dal argument
 
-        launch();                       //#?
+        launch();                       //invoca il metodo start
     }
 
 }
