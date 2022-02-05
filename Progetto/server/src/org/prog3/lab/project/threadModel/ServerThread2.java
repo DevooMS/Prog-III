@@ -13,9 +13,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-public class ServerThread implements Runnable{
+public class ServerThread2 implements Runnable{
 
-    private static final int NUM_THREAD = 3;
+    private static final int NUM_THREAD = 3;    
     private final Semaphore loginSem;
     private final Semaphore logoutSem;
     private final Semaphore connectionSem;
@@ -25,7 +25,7 @@ public class ServerThread implements Runnable{
     private final Semaphore removeSem;
     private User user;
 
-    public ServerThread(Semaphore loginSem, Semaphore logoutSem, Semaphore connectionSem, Semaphore sendSem, Semaphore errorSendSem, Semaphore receivedSem, Semaphore removeSem){
+    public ServerThread2(Semaphore loginSem, Semaphore logoutSem, Semaphore connectionSem, Semaphore sendSem, Semaphore errorSendSem, Semaphore receivedSem, Semaphore removeSem){
         this.loginSem = loginSem;
         this.logoutSem = logoutSem;
         this.connectionSem = connectionSem;
@@ -39,7 +39,7 @@ public class ServerThread implements Runnable{
     public void run(){
         try {
             ServerSocket s = new ServerSocket(8190);
-            ExecutorService accessThreads = Executors.newFixedThreadPool(NUM_THREAD);
+            ExecutorService accessThreads = Executors.newFixedThreadPool(NUM_THREAD);      //assegno 3 thread a ciascuno di questo threadpools chiama i rispetivi run();
             ExecutorService updateThreads = Executors.newFixedThreadPool(NUM_THREAD);
             ExecutorService sendThreads = Executors.newFixedThreadPool(NUM_THREAD);
             ExecutorService removeThreads = Executors.newFixedThreadPool(NUM_THREAD);
@@ -51,13 +51,13 @@ public class ServerThread implements Runnable{
                 while(accept) {
                     Socket incoming = s.accept();
 
-                    ObjectOutputStream outStream = new ObjectOutputStream(incoming.getOutputStream());
+                    ObjectOutputStream outStream = new ObjectOutputStream(incoming.getOutputStream());          
                     ObjectInputStream inStream = new ObjectInputStream(incoming.getInputStream());
 
                     Vector<String> v = null;
 
                     try {
-                        v = ((Vector<String>) inStream.readObject());
+                        v = ((Vector<String>) inStream.readObject());                       //leggo il contenuto mandato dal client
                     } catch (ClassNotFoundException e) {
                         System.out.println(e.getMessage());
                     }
@@ -69,7 +69,7 @@ public class ServerThread implements Runnable{
 
                     if(operation.equals("login") || operation.equals("logout") || operation.equals("update") || operation.equals("send") || operation.equals("remove")){
                         try {
-                            user = (User) inStream.readObject();
+                            user = (User) inStream.readObject();    //se appartiene a uno di questi operazione gli passo oggetto user
                         } catch (ClassNotFoundException e) {
                             System.out.println(e.getMessage());
                         }
@@ -79,14 +79,14 @@ public class ServerThread implements Runnable{
 
                     switch (operation) {
                         case "login" -> {
-                            path = getClass().getResource("../resources/log/login/" + user.getUserEmail()).getPath();
-                            //path = "./server/src/org/prog3/lab/project/resources/log/login/" + user.getUserEmail();
-                            Runnable loginTask = new AccessTask(user, connectionSem, loginSem, logThreads, "login", path);
-                            accessThreads.execute(loginTask);
+                            path = getClass().getResource("../resources/log/login/" + user.getUserEmail()).getPath();           //prende il path e email
+
+                            Runnable loginTask = new AccessTask(user, connectionSem, loginSem, logThreads, "login", path);  //prepara il nuovo runnable e chiamo la classe AccessTask
+                            accessThreads.execute(loginTask);                                                                       //eseguo il runnable chiamando AccessTask run();
                         }
                         case "logout" -> {
                             path = getClass().getResource("../resources/log/logout/" + user.getUserEmail()).getPath();
-                            //path = "./server/src/org/prog3/lab/project/resources/log/logout/" + user.getUserEmail();
+
                             Runnable logoutTask = new AccessTask(user, connectionSem, logoutSem, logThreads, "logout", path);
                             accessThreads.execute(logoutTask);
                         }
@@ -97,13 +97,13 @@ public class ServerThread implements Runnable{
                         }
                         case "send" -> {
                             path = getClass().getResource("../resources/userClients/" + user.getUserEmail() + "/sendedEmails/").getPath();
-                            //path = "./server/src/org/prog3/lab/project/resources/userClients.userClients/" + user.getUserEmail() + "/sendedEmails/";
+
                             Runnable sendTask = new SendTask(connectionSem, sendSem, errorSendSem, receivedSem, logThreads, path, user, v.get(1), v.get(2), v.get(3), outStream);
                             sendThreads.execute(sendTask);
                         }
                         case "remove" -> {
                             path = getClass().getResource("../resources/userClients/" + user.getUserEmail() + "/" + v.get(1) + "/").getPath();
-                            //path = "./server/src/org/prog3/lab/project/resources/userClients.userClients/" + user.getUserEmail() + "/" + v.get(1) + "/" + v.get(2);
+
                             Runnable removeTask = new RemoveTask(user, connectionSem, removeSem, logThreads, path, v.get(2), outStream);
                             removeThreads.execute(removeTask);
                         }

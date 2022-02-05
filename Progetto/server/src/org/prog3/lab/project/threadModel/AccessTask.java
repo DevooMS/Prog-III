@@ -29,7 +29,7 @@ public class AccessTask implements Runnable{
     public void run(){
         String logDate = logDateFormatter.format(LocalDateTime.now());
 
-        logThreads.execute(new LogTask(connectionSem, getClass().getResource("../resources/log/connection/" + user.getUserEmail()).getPath(), "open "+ operation +" connection", logDate));
+        logThreads.execute(new LogTask(connectionSem, getClass().getResource("../resources/log/connection/" + user.getUserEmail()).getPath(), "open "+ operation +" connection", logDate));    //eseguo logthread
 
         logDate = logDateFormatter.format(LocalDateTime.now());
         logThreads.execute(new LogTask(accessSem, accessFilePath, operation, logDate));

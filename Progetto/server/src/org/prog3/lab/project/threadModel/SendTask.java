@@ -52,7 +52,7 @@ public class SendTask implements Runnable{
     public void run(){
 
         logDate = logDateFormatter.format(LocalDateTime.now());
-        logThreads.execute(new LogTask(connectionSem, getClass().getResource("../resources/log/connection/" + user.getUserEmail()).getPath(), "open send connection", logDate));
+        logThreads.execute(new LogTask(connectionSem, getClass().getResource("../resources/log/connection/" + user.getUserEmail()).getPath(), "open send connection", logDate));  //invio il log alla classe logTask
 
         fileDate = fileDateFormatter.format(LocalDateTime.now());
         file_send = new File(path + fileDate + ".txt");
@@ -127,7 +127,7 @@ public class SendTask implements Runnable{
         }
     }
 
-    private void checkAddress(String receivers){
+    private void checkAddress(String receivers){    //chiamato dalla run
 
         int start=0;
         int end = 0;
@@ -143,7 +143,7 @@ public class SendTask implements Runnable{
             else
                 receiver = receivers.substring(start);
 
-            String user_folder_path = getClass().getResource("../resources/userClients/").getPath();
+            String user_folder_path = getClass().getResource("../resources/userClients/").getPath();    //#? sul nuovo versione si chiama unserinbox
 
             File folder = new File( user_folder_path + "/" + receiver);
 
@@ -229,7 +229,7 @@ public class SendTask implements Runnable{
             writeFile(user.getUserEmail(), false, out);
             writeFile("Indirizzi email errati", false, out);
             writeFile(logDate, false, out);
-            writeFile("Nella mail con oggetto \""+object+"\", iseguenti indirizzi email sono errati: \n\n"+wrongAddress+"\n\nN:B:: si prega di non rispondere a questa email.", true, out);
+            writeFile("Nella mail con oggetto \""+object+"\", i seguenti indirizzi email sono errati: \n\n"+wrongAddress+"\n\nN:B:: si prega di non rispondere a questa email.", true, out);
 
             out.close();
         }

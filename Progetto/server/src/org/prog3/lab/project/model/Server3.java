@@ -8,15 +8,15 @@ import javafx.collections.ObservableList;
 import java.io.*;
 import java.util.concurrent.Semaphore;
 
-public class Server {
-    private final ObservableList<String> listClients;
+public class Server3 {
+    private final ObservableList<String> listClients;    
     private final ListProperty<String> listClientsProperty;
     private final ObservableList<String> listConnection;
     private final ListProperty<String> listConnectionProperty;
     private final ObservableList<String> listSend;
     private final ListProperty<String> listSendProperty;
     private final ObservableList<String> listErrorSend;
-    private final ListProperty<String> listErrorSendProperty;
+    private final ListProperty<String> listErrorSendProperty; 
     private final ObservableList<String> listReceived;
     private final ListProperty<String> listReceivedProperty;
     private final ObservableList<String> listLogin;
@@ -26,10 +26,10 @@ public class Server {
     private final ObservableList<String> listRemove;
     private final ListProperty<String> listRemoveProperty;
 
-    public Server(){
-        this.listClients = FXCollections.observableArrayList();
-        this.listClientsProperty = new SimpleListProperty<>();
-        this.listClientsProperty.set(listClients);
+    public Server3(){
+        this.listClients = FXCollections.observableArrayList();         //creo un lista osservabile per listClients
+        this.listClientsProperty = new SimpleListProperty<>();          //faccio un simple list 
+        this.listClientsProperty.set(listClients);                      //inserisco listClients dentro la property
         this.listConnection = FXCollections.observableArrayList();
         this.listConnectionProperty = new SimpleListProperty<>();
         this.listConnectionProperty.set(listConnection);
@@ -69,7 +69,7 @@ public class Server {
 
     public ListProperty<String> listRemoveProperty(){ return listRemoveProperty;}
 
-    public void addUser(String filePath){
+    public void addUser(String filePath){  //chiamato da model.addUser
         BufferedReader reader = null;
         try {
             reader = new BufferedReader(new FileReader(filePath));
@@ -81,7 +81,7 @@ public class Server {
             String user = reader.readLine();
 
             while (user != null) {
-                listClients.add(user);
+                listClients.add(user);     //aggiunge gli indirizzi email dentro la lista
                 user = reader.readLine();
             }
         } catch (IOException e) {
@@ -97,7 +97,7 @@ public class Server {
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
-            connectionSem.release();
+            connectionSem.release();            //quando finisce rilascia il semaforo
         }
 
         return ris;

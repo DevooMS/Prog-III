@@ -12,7 +12,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
-import org.prog3.lab.project.model.Server;
+import org.prog3.lab.project.model.Server3;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -21,7 +21,7 @@ import java.net.Socket;
 import java.util.Vector;
 import java.util.concurrent.Semaphore;
 
-public class ServerController {
+public class ServerController3 {   /*imposto il view presi da fxml*/
 
     @FXML
     private Button btnLogoff;
@@ -80,7 +80,7 @@ public class ServerController {
     @FXML
     private ListView listRemove;
 
-    private Server model;
+    private Server3 model;
     private Stage stage;
     private Semaphore loginSem;
     private Semaphore logoutSem;
@@ -92,13 +92,13 @@ public class ServerController {
     Timeline timeline;
 
     @FXML
-    public void initialize(Stage stage, Semaphore loginSem, Semaphore logoutSem, Semaphore connectionSem, Semaphore sendSem,  Semaphore errorSendSem, Semaphore receivedSem, Semaphore removeSem)  {
+    public void initialize(Stage stage, Semaphore loginSem, Semaphore logoutSem, Semaphore connectionSem, Semaphore sendSem, Semaphore errorSendSem, Semaphore receivedSem, Semaphore removeSem) {
         if (this.model != null)
             throw new IllegalStateException("Model can only be initialized once");
 
-        this.model = new Server();
+        this.model = new Server3();      //faccio un instanza nuovo di Server
         this.stage = stage;
-        this.loginSem = loginSem;
+        this.loginSem = loginSem;       /*inizializzo parametri pressi da Server main*/
         this.logoutSem = logoutSem;
         this.connectionSem = connectionSem;
         this.sendSem = sendSem;
@@ -106,8 +106,8 @@ public class ServerController {
         this.receivedSem = receivedSem;
         this.removeSem = removeSem;
 
-        listClients.itemsProperty().bind(model.listClientsProperty());
-        listClients.setOnMouseClicked(this::updateLog);
+        listClients.itemsProperty().bind(model.listClientsProperty());    //bind tra listClients e elemento grafico listClients contiene tutti gli indrizzi email
+        listClients.setOnMouseClicked(this::updateLog);                    //quando e cliccato chiamo la funzione updateLog
         listConnection.itemsProperty().bind(model.listConnectionProperty());
         listSend.itemsProperty().bind(model.listSendProperty());
         listErrorSend.itemsProperty().bind(model.listErrorSendProperty());
@@ -116,7 +116,7 @@ public class ServerController {
         listLogout.itemsProperty().bind(model.listLogoutProperty());
         listRemove.itemsProperty().bind(model.listRemoveProperty());
 
-        timeline = new Timeline(new KeyFrame(Duration.seconds(30), ev -> updateLogForType()));
+        timeline = new Timeline(new KeyFrame(Duration.seconds(30), ev -> updateLogForType()));  //#?
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
 
@@ -133,13 +133,15 @@ public class ServerController {
         serverLogOff();
     }
 
-    private void btnUpdateClick(ActionEvent actionEvent) { updateLogForType(); }
+    private void btnUpdateClick(ActionEvent actionEvent) {
+        updateLogForType();
+    }
 
     private void stageClose(WindowEvent windowEvent) {
         serverLogOff();
     }
 
-    private void serverLogOff() {
+    private void serverLogOff() {   //apro un socket verso serverthread e invio l'operazione terminate
         timeline.stop();
         try {
             Socket s = new Socket(InetAddress.getLocalHost().getHostName(), 8190);
@@ -170,7 +172,7 @@ public class ServerController {
     }
 
     private void updateLogForType() {
-        if (listClients.getSelectionModel().getSelectedItem() != null){
+        if (listClients.getSelectionModel().getSelectedItem() != null) {
             logConnection((String) listClients.getSelectionModel().getSelectedItem());
 
             logSend((String) listClients.getSelectionModel().getSelectedItem());
@@ -187,8 +189,8 @@ public class ServerController {
         }
     }
 
-    private void logConnection(String item){
-        if (model.showLogConnection(item, connectionSem)) {
+    private void logConnection(String item) {
+        if (model.showLogConnection(item, connectionSem)) {  //chiama showLogConnection #?
             noConnection.setVisible(false);
             listConnection.setVisible(true);
         } else {
@@ -197,61 +199,61 @@ public class ServerController {
         }
     }
 
-    private void logSend(String item){
-        if(model.showLogSend(item, sendSem)){
+    private void logSend(String item) {
+        if (model.showLogSend(item, sendSem)) {
             noSend.setVisible(false);
             listSend.setVisible(true);
-        } else{
+        } else {
             noSend.setVisible(true);
             listSend.setVisible(false);
         }
     }
 
-    private void logErrorSend(String item){
-        if(model.showLogErrorSend(item, errorSendSem)){
+    private void logErrorSend(String item) {
+        if (model.showLogErrorSend(item, errorSendSem)) {
             noErrorSend.setVisible(false);
             listErrorSend.setVisible(true);
-        } else{
+        } else {
             noErrorSend.setVisible(true);
             listErrorSend.setVisible(false);
         }
     }
 
-    private void logReceived(String item){
-        if(model.showLogReceived(item, receivedSem)){
+    private void logReceived(String item) {
+        if (model.showLogReceived(item, receivedSem)) {
             noReceived.setVisible(false);
             listReceived.setVisible(true);
-        } else{
+        } else {
             noReceived.setVisible(true);
             listReceived.setVisible(false);
         }
     }
 
-    private void logLogin(String item){
-        if(model.showLogLogin(item, loginSem)){
+    private void logLogin(String item) {
+        if (model.showLogLogin(item, loginSem)) {
             noLogin.setVisible(false);
             listLogin.setVisible(true);
-        } else{
+        } else {
             noLogin.setVisible(true);
             listLogin.setVisible(false);
         }
     }
 
-    private void logLogout(String item){
-        if(model.showLogLogout(item, logoutSem)){
+    private void logLogout(String item) {
+        if (model.showLogLogout(item, logoutSem)) {
             noLogout.setVisible(false);
             listLogout.setVisible(true);
-        } else{
+        } else {
             noLogout.setVisible(true);
             listLogout.setVisible(false);
         }
     }
 
-    private void logRemove(String item){
-        if(model.showLogRemove(item, removeSem)){
+    private void logRemove(String item) {
+        if (model.showLogRemove(item, removeSem)) {
             noRemove.setVisible(false);
             listRemove.setVisible(true);
-        } else{
+        } else {
             noRemove.setVisible(true);
             listRemove.setVisible(false);
         }

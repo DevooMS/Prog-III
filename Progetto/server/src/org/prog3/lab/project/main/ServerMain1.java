@@ -5,12 +5,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.prog3.lab.project.threadModel.*;
-import org.prog3.lab.project.ui.ServerController;
+import org.prog3.lab.project.ui.ServerController3;
 
 import java.io.*;
 import java.util.concurrent.Semaphore;
 
-public class ServerMain extends Application {
+public class ServerMain1 extends Application {
 
     private static final Semaphore loginSem = new Semaphore(1);
     private static final Semaphore logoutSem = new Semaphore(1);
@@ -22,16 +22,16 @@ public class ServerMain extends Application {
 
     public static void main(String[] args) {
 
-        ServerThread st = new ServerThread(loginSem, logoutSem, connectionSem, sendSem, errorSendSem, receivedSem, removeSem);
+        ServerThread2 st = new ServerThread2(loginSem, logoutSem, connectionSem, sendSem, errorSendSem, receivedSem, removeSem);   //pepare di Thread con dentro i semafori binari e chiamo ServerThread
         Thread t = new Thread(st);
-        t.start();
+        t.start();          //faccio partire un thread per ServerThread
 
-        launch();
+        launch();           //chiamo la start
     }
 
     @Override
     public void start(Stage stage) {
-        FXMLLoader loaderServerPanel = new FXMLLoader(getClass().getResource("../resources/panelAdmin.fxml"));
+        FXMLLoader loaderServerPanel = new FXMLLoader(getClass().getResource("../resources/panelAdmin.fxml"));    //carico fxml
         Scene scene = null;
         try {
             scene = new Scene(loaderServerPanel.load());
@@ -39,8 +39,8 @@ public class ServerMain extends Application {
             e.printStackTrace();
         }
 
-        ServerController serverController = loaderServerPanel.getController();
-        serverController.initialize(stage, loginSem, logoutSem, connectionSem, sendSem, errorSendSem, receivedSem, removeSem);
+        ServerController3 serverController = loaderServerPanel.getController();
+        serverController.initialize(stage, loginSem, logoutSem, connectionSem, sendSem, errorSendSem, receivedSem, removeSem);       //chiamo initialize di ServerController
         stage.setTitle("main page");
         stage.setScene(scene);
         stage.setMinWidth(741);

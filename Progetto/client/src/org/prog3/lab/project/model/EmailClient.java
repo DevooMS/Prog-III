@@ -163,7 +163,7 @@ public class EmailClient {
         return countEmails;
     }
 
-    private String serverRemoveEmail(User user, String emailType, String emailId){
+    private String serverRemoveEmail(User user, String emailType, String emailId){  //chiamato da deleteEmail
 
         String response;
 

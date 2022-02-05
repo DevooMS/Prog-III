@@ -17,7 +17,7 @@ public class EmailClientMain extends Application {
         FXMLLoader loaderEmailClient = new FXMLLoader(getClass().getResource("../resources/emailClient.fxml")); //carico il file fxml
         Scene scene = new Scene(loaderEmailClient.load());                  //scena nuova
         EmailClientController emailClientController = loaderEmailClient.getController();
-        emailClientController.initialize(user, stage);                     //faccio partire il controller di EmailClientController.java
+        emailClientController.initialize(user, stage);                     //faccio partire il controller di EmailClientController.java faccendo initialize in EmailClientController.java
         stage.setTitle("Email client");                                    //imposto la grandezza il titolo
         stage.setScene(scene);
         stage.setMinWidth(950);

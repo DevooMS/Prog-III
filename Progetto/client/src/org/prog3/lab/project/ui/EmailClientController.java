@@ -95,7 +95,7 @@ public class EmailClientController {
 
         this.user = user;
 
-        this.model = new EmailClient();
+        this.model = new EmailClient();    //faccio una nuova instanza di EmailClient
 
         model.serverLogin(user);
 
@@ -121,7 +121,7 @@ public class EmailClientController {
 
         viewEmailDetail(emptyEmail);                                                                //chiamo il metodo viewEmailDetail prende l'email e cambia i componenti grafici
 
-        emailUpdate = new Timeline(new KeyFrame(Duration.seconds(30), ev -> showEmails(false, startUpdate)));
+        emailUpdate = new Timeline(new KeyFrame(Duration.seconds(30), ev -> showEmails(false, startUpdate)));  //set di update ogni 30 secondi
         emailUpdate.setCycleCount(Timeline.INDEFINITE);
         emailUpdate.play();
 
@@ -131,13 +131,13 @@ public class EmailClientController {
         });
     }
 
-    private void updateEmailsLists(Event event) {
+    private void updateEmailsLists(Event event) {    //chiamato dal setOnAction
 
         showEmails(false, startUpdate);
 
     }
 
-    private void showEmails(boolean updateSended, boolean startUpdate) {
+    private void showEmails(boolean updateSended, boolean startUpdate) {                    //quando e stato chiamato chiama updateEmailslists apre un socket verso il server
         int countNewEmails = model.updateEmailslists(user, updateSended, startUpdate);
 
         if (countNewEmails < 0) {
@@ -149,7 +149,7 @@ public class EmailClientController {
 
             if(this.startUpdate)
                 this.startUpdate = false;
-        } else {
+        } else {                                                                            //condizione che ci sono email
             onlineLabel.setVisible(true);
             offlineLabel.setVisible(false);
 
@@ -164,7 +164,7 @@ public class EmailClientController {
         }
     }
 
-    protected void showSelectReceivedEmail(MouseEvent mouseEvent) {
+    protected void showSelectReceivedEmail(MouseEvent mouseEvent) { //chiamato dal setOnmouseEvent
 
         if (!activate)
             activeFiled();
@@ -231,7 +231,7 @@ public class EmailClientController {
         showEmailWriter("", "I: " + selectEmail.getObject(), selectEmail.getText());
     }
 
-    private void showEmailWriter(String to, String object, String text) {
+    private void showEmailWriter(String to, String object, String text) {                   //faccio partire EmailWriter
 
         try {
             FXMLLoader loaderEmailWriter = new FXMLLoader(getClass().getResource("../resources/emailWriter.fxml"));
