@@ -140,7 +140,7 @@ public class EmailClientController {
     private void showEmails(boolean updateSended, boolean startUpdate) {                    //quando e stato chiamato chiama updateEmailslists apre un socket verso il server
         int countNewEmails = model.updateEmailslists(user, updateSended, startUpdate);
 
-        if (countNewEmails < 0) {
+        if (countNewEmails < 0) {                           //fa la richiesta se richiesta e negativa torna  countEmails = -1;
             onlineLabel.setVisible(false);
             offlineLabel.setVisible(true);
         } else if (countNewEmails == 0) {
@@ -153,7 +153,7 @@ public class EmailClientController {
             onlineLabel.setVisible(true);
             offlineLabel.setVisible(false);
 
-            if(this.startUpdate)
+            if(this.startUpdate)                                //va vedere nel log se il contenuto non e READ allora email e nuovo e viene messo nel countNewEmails
                 this.startUpdate = false;
 
             Alert alert = new Alert(Alert.AlertType.INFORMATION);

@@ -11,7 +11,7 @@ public class Email implements Serializable{ //Serializazble server per preparare
     private final String object;
     private final String date;
     private final String text;
-
+    //id=nome del file ;type=sendedEmailo recived;sender= chi lo manda; reciver chi lo riceve;object=oggetto del email; data data; text contenuto
     public Email(String id, String type, String sender, String receivers, String object, String date, String text){
         this.id = id;
         this.type = type;               //il type indica l'operazione che vado eseguire che puo essere sendedEmail oppure recivedEmail

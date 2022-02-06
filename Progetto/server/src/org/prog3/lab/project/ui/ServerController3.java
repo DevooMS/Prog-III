@@ -116,7 +116,7 @@ public class ServerController3 {   /*imposto il view presi da fxml*/
         listLogout.itemsProperty().bind(model.listLogoutProperty());
         listRemove.itemsProperty().bind(model.listRemoveProperty());
 
-        timeline = new Timeline(new KeyFrame(Duration.seconds(30), ev -> updateLogForType()));  //#?
+        timeline = new Timeline(new KeyFrame(Duration.seconds(30), ev -> updateLogForType()));  //un timer di javafx che ogni 30sec chiama update
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
 
@@ -190,7 +190,7 @@ public class ServerController3 {   /*imposto il view presi da fxml*/
     }
 
     private void logConnection(String item) {
-        if (model.showLogConnection(item, connectionSem)) {  //chiama showLogConnection #?
+        if (model.showLogConnection(item, connectionSem)) {  //chiama showLogConnection
             noConnection.setVisible(false);
             listConnection.setVisible(true);
         } else {
