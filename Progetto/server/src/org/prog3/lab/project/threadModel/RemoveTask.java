@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.ObjectOutputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Semaphore;
 
@@ -34,33 +35,31 @@ public class RemoveTask implements Runnable {
     public void run(){
 
         String logDate = logDateFormatter.format(LocalDateTime.now());
-        logThreads.execute(new LogTask(connectionSem, getClass().getResource("../resources/log/connection/" + user.getUserEmail()).getPath(), "open remove connection", logDate));
+        logThreads.execute(new LogTask(connectionSem, Objects.requireNonNull(getClass().getResource("../resources/log/connection/" + user.getUserEmail())).getPath(), "remove connection", logDate));
 
         try {
             user.getReadWrite().acquire();
 
-            File file_remove = new File(path + file_name);
+            File file_remove = new File(path + file_name);                              //prendo il path preso da ServerThread
 
             String response;
 
             if(file_remove.delete()) {
 
                 logDate = logDateFormatter.format(LocalDateTime.now());
-                logThreads.execute(new LogTask(removeSem, getClass().getResource("../resources/log/remove/" + user.getUserEmail()).getPath(), "remove email", logDate));
+                logThreads.execute(new LogTask(removeSem, Objects.requireNonNull(getClass().getResource("../resources/log/remove/" + user.getUserEmail())).getPath(), "remove email", logDate));
 
                 response = "remove_correct";
             } else {
 
                 logDate = logDateFormatter.format(LocalDateTime.now());
-                logThreads.execute(new LogTask(removeSem, getClass().getResource("../resources/log/remove/" + user.getUserEmail()).getPath(), "remove error", logDate));
+                logThreads.execute(new LogTask(removeSem, Objects.requireNonNull(getClass().getResource("../resources/log/remove/" + user.getUserEmail())).getPath(), "remove error", logDate));
 
                 response = "remove_error";
             }
 
             outStream.writeObject(response);
 
-            logDate = logDateFormatter.format(LocalDateTime.now());
-            logThreads.execute(new LogTask(connectionSem, getClass().getResource("../resources/log/connection/" + user.getUserEmail()).getPath(), "close remove connection", logDate));
         } catch(Exception e){
             System.out.println(e.getMessage());
         } finally {

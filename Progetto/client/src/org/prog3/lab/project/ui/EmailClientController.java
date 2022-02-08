@@ -21,6 +21,9 @@ import org.prog3.lab.project.model.Email;
 import org.prog3.lab.project.model.EmailClient;
 import org.prog3.lab.project.model.User;
 
+import java.io.File;
+import java.util.Objects;
+
 public class EmailClientController {
 
     @FXML
@@ -82,6 +85,7 @@ public class EmailClientController {
 
     private EmailClient model;
     private User user;
+    Stage stage;
     boolean startUpdate;
     private static Email selectEmail;
     private Email emptyEmail;
@@ -94,12 +98,13 @@ public class EmailClientController {
             throw new IllegalStateException("Model can only be initialized once");
 
         this.user = user;
-
-        this.model = new EmailClient();    //faccio una nuova instanza di EmailClient
+        this.stage = stage;
+        this.model = new EmailClient();
 
         model.serverLogin(user);
 
         startUpdate = true;
+
         //istanza nuovo client
         showEmails(true, startUpdate);  //inizio partendo con update della lista inviate
 
@@ -107,7 +112,7 @@ public class EmailClientController {
         labelAccountName.setText(user.getUserEmail());          //Prendo il labelAcc.. E accedo al textProperty e faccio il bind al nostro property|| ogni volta che si modifica model mi modifica anche listReceiv e modifica in tempo reale il view di questo label
         listReceivedEmails.itemsProperty().bind(model.receivedEmailsProperty());     //stessa cosa per le listReceivedEmails il bind cambia i dati la view cambia quando i dati sono cambiati
         listReceivedEmails.setOnMouseClicked(this::showSelectReceivedEmail);         //chiamo la funzione showSelectRecivedEmail alla pressione del mouse
-        listSendedEmails.itemsProperty().bind(model.sendedEmailsProperty());         //#?
+        listSendedEmails.itemsProperty().bind(model.sendedEmailsProperty());         
         listSendedEmails.setOnMouseClicked(this::showSelectSendedEmail);
         btnReply.setOnAction(this::btnReplyClick);                                  //sono i relativi bottoni che chiamano i relativi funzioni
         btnReplyAll.setOnAction(this::btnReplyAllClick);
@@ -121,55 +126,58 @@ public class EmailClientController {
 
         viewEmailDetail(emptyEmail);                                                                //chiamo il metodo viewEmailDetail prende l'email e cambia i componenti grafici
 
-        emailUpdate = new Timeline(new KeyFrame(Duration.seconds(30), ev -> showEmails(false, startUpdate)));  //set di update ogni 30 secondi
+        emailUpdate = new Timeline(new KeyFrame(Duration.seconds(30), ev -> showEmails(false, startUpdate)));   //set di update ogni 30 secondi
         emailUpdate.setCycleCount(Timeline.INDEFINITE);
         emailUpdate.play();
 
         stage.setOnCloseRequest(windowEvent -> {
             emailUpdate.stop();
-            model.serverLogout(user);    //Chiamo serverLogout di Email e apre un socket nel quale chiude il socket
+            model.serverLogout(user);                                               //Chiamo serverLogout di Email e apre un socket nel quale chiude il socket
         });
     }
 
-    private void updateEmailsLists(Event event) {    //chiamato dal setOnAction
+    private void updateEmailsLists(Event event) {                                    //chiamato dal setOnAction
 
         showEmails(false, startUpdate);
 
     }
 
-    private void showEmails(boolean updateSended, boolean startUpdate) {                    //quando e stato chiamato chiama updateEmailslists apre un socket verso il server
+    private void showEmails(boolean updateSended, boolean startUpdate) {            //Quando e stato chiamato chiama updateEmailslists apre un socket verso il server
+        if(!stage.isShowing())  //si riferisce allo stage del client
+            stage.show();
+
         int countNewEmails = model.updateEmailslists(user, updateSended, startUpdate);
 
-        if (countNewEmails < 0) {                           //fa la richiesta se richiesta e negativa torna  countEmails = -1;
+        if (countNewEmails < 0) {                                                  //fa la richiesta se richiesta e negativa torna  countEmails = -1;         
             onlineLabel.setVisible(false);
             offlineLabel.setVisible(true);
         } else if (countNewEmails == 0) {
             onlineLabel.setVisible(true);
             offlineLabel.setVisible(false);
 
-            if(this.startUpdate)
+            if(this.startUpdate)                                                  //condizione che ci sono email          
                 this.startUpdate = false;
-        } else {                                                                            //condizione che ci sono email
+        } else {
             onlineLabel.setVisible(true);
             offlineLabel.setVisible(false);
 
-            if(this.startUpdate)                                //va vedere nel log se il contenuto non e READ allora email e nuovo e viene messo nel countNewEmails
+            if(this.startUpdate)                                                //va vedere nel log se il contenuto non e READ allora email e nuovo e viene messo nel countNewEmails
                 this.startUpdate = false;
 
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setHeaderText(null);
             alert.setTitle("Nuove email ricevute");
             alert.setContentText("Hai ricevuto " + countNewEmails + "email");
-            alert.showAndWait();
+            alert.show();
         }
     }
 
-    protected void showSelectReceivedEmail(MouseEvent mouseEvent) { //chiamato dal setOnmouseEvent
+    protected void showSelectReceivedEmail(MouseEvent mouseEvent) {             //chiamato dal setOnmouseEvent
 
         if (!activate)
             activeFiled();
 
-        selectEmail = (Email) listReceivedEmails.getSelectionModel().getSelectedItem(); //casting ??
+        selectEmail = (Email) listReceivedEmails.getSelectionModel().getSelectedItem(); 
 
         btnShow();
 
@@ -224,14 +232,39 @@ public class EmailClientController {
     }
 
     private void btnReplyAllClick(ActionEvent actionEvent) {
-        showEmailWriter(selectEmail.getSender() + "," + selectEmail.getReceivers(), "R: " + selectEmail.getObject(), selectEmail.getText());
+        int start=0;
+        int end = 0;
+        String receivers = selectEmail.getReceivers();
+        String replyAllReceivers = "";
+
+        while(end>=0){
+
+            end = receivers.indexOf(",", start);
+
+            String receiver;
+
+            if(end>=0)
+                receiver = receivers.substring(start, end);
+            else
+                receiver = receivers.substring(start);
+
+            if(!receiver.equals(user.getUserEmail())) {
+                if(receiver.equals(""))
+                    replyAllReceivers += receiver;
+                else
+                    replyAllReceivers += ","+receiver;
+            }
+
+            start = end+1;
+        }
+        showEmailWriter(selectEmail.getSender() + replyAllReceivers, "R: " + selectEmail.getObject(), selectEmail.getText());
     }
 
     private void btnForwardClick(ActionEvent actionEvent) {
         showEmailWriter("", "I: " + selectEmail.getObject(), selectEmail.getText());
     }
 
-    private void showEmailWriter(String to, String object, String text) {                   //faccio partire EmailWriter
+    private void showEmailWriter(String to, String object, String text) {                               //faccio partire EmailWriter
 
         try {
             FXMLLoader loaderEmailWriter = new FXMLLoader(getClass().getResource("../resources/emailWriter.fxml"));

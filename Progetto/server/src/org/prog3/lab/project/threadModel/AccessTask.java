@@ -1,8 +1,10 @@
 package org.prog3.lab.project.threadModel;
 
 import org.prog3.lab.project.model.User;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Semaphore;
 
@@ -29,12 +31,9 @@ public class AccessTask implements Runnable{
     public void run(){
         String logDate = logDateFormatter.format(LocalDateTime.now());
 
-        logThreads.execute(new LogTask(connectionSem, getClass().getResource("../resources/log/connection/" + user.getUserEmail()).getPath(), "open "+ operation +" connection", logDate));    //eseguo logthread
+        logThreads.execute(new LogTask(connectionSem, Objects.requireNonNull(getClass().getResource("../resources/log/connection/" + user.getUserEmail())).getPath(), operation +" connection", logDate));      //eseguo logthread
 
         logDate = logDateFormatter.format(LocalDateTime.now());
         logThreads.execute(new LogTask(accessSem, accessFilePath, operation, logDate));
-
-        logDate = logDateFormatter.format(LocalDateTime.now());
-        logThreads.execute(new LogTask(connectionSem, getClass().getResource("../resources/log/connection/" + user.getUserEmail()).getPath(), "close "+ operation +" connection", logDate));
     }
 }

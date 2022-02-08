@@ -19,8 +19,8 @@ public class LogTask implements Runnable{
         this.date = date;
     }
 
-    public void run(){
-        File fileLog = new File(path);
+    public void run(){                      //usato per scrivere il contenuto dei vari log
+        File fileLog = new File(path);      //indica il percorso il nome del indirizzo email e loperazione del log nella quale deve scrivere
         FileWriter fileLogWriter;
 
         try {

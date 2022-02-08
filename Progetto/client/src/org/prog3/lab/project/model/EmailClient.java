@@ -125,13 +125,12 @@ public class EmailClient {
                     }
 
                     if (emailDetail.size() > 0) {
-                        Email e;
+
+                        Email e = new Email(emailDetail.get(0), mailType, emailDetail.get(1), emailDetail.get(2), emailDetail.get(3), emailDetail.get(4), emailDetail.get(5));   //nuovo oggetto email
 
                         if (mailType.equals("receivedEmails")) {
-                            e = new Email(emailDetail.get(0), mailType, emailDetail.get(1), emailDetail.get(2), emailDetail.get(3), emailDetail.get(4), emailDetail.get(5));   //nuovo oggetto email
                             user.addReceivedEmail(e);
                         }else {
-                            e = new Email(emailDetail.get(0), mailType, emailDetail.get(2), emailDetail.get(1), emailDetail.get(3), emailDetail.get(4), emailDetail.get(5));
                             user.addSendedEmails(e);
                         }
                     }
@@ -163,7 +162,7 @@ public class EmailClient {
         return countEmails;
     }
 
-    private String serverRemoveEmail(User user, String emailType, String emailId){  //chiamato da deleteEmail
+    private String serverRemoveEmail(User user, String emailType, String emailId){
 
         String response;
 

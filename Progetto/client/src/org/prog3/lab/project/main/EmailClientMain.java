@@ -17,19 +17,19 @@ public class EmailClientMain extends Application {
         FXMLLoader loaderEmailClient = new FXMLLoader(getClass().getResource("../resources/emailClient.fxml")); //carico il file fxml
         Scene scene = new Scene(loaderEmailClient.load());                  //scena nuova
         EmailClientController emailClientController = loaderEmailClient.getController();
-        emailClientController.initialize(user, stage);                     //faccio partire il controller di EmailClientController.java faccendo initialize in EmailClientController.java
         stage.setTitle("Email client");                                    //imposto la grandezza il titolo
         stage.setScene(scene);
         stage.setMinWidth(950);
         stage.setMinHeight(650);
         stage.setResizable(true);
         stage.setMaximized(true);
-        stage.show();
+        emailClientController.initialize(user, stage);                      //faccio partire il controller di EmailClientController.java faccendo initialize in EmailClientController.java
+        //stage.show();
 
     }
 
-    public static void main(String[] args) {                                
-        user = new User(args[0]);       //#? fa un oggetto user gli passa useremail dal argument
+    public static void main(String[] args) {
+        user = new User(args[0]);       // fa un oggetto user gli passa useremail dal argument
 
         launch();                       //invoca il metodo start
     }

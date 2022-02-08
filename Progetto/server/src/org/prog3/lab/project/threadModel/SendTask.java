@@ -8,6 +8,7 @@ import java.nio.channels.FileChannel;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Semaphore;
 
@@ -52,24 +53,24 @@ public class SendTask implements Runnable{
     public void run(){
 
         logDate = logDateFormatter.format(LocalDateTime.now());
-        logThreads.execute(new LogTask(connectionSem, getClass().getResource("../resources/log/connection/" + user.getUserEmail()).getPath(), "open send connection", logDate));  //invio il log alla classe logTask
+        logThreads.execute(new LogTask(connectionSem, Objects.requireNonNull(getClass().getResource("../resources/log/connection/" + user.getUserEmail())).getPath(), "send connection", logDate));
 
         fileDate = fileDateFormatter.format(LocalDateTime.now());
-        file_send = new File(path + fileDate + ".txt");
+        file_send = new File(path + fileDate + ".txt");             //creo l'oggetto
 
         String response = "send_error";
 
         try {
 
-            if(file_send.exists()){
+            if(file_send.exists()){                                 //se il file esiste gia allora faccio
                 response = "send_error";
             }else {
 
-                checkAddress(receivers);
+                checkAddress(receivers);                            //verifica se indirizzo e corretto chiama il metodo
 
-                if(file_send.createNewFile()) {
+                if(file_send.createNewFile()) {                     //crea il file
 
-                    PrintWriter out = new PrintWriter(file_send);
+                    PrintWriter out = new PrintWriter(file_send);       //usato per scrivere su file Se nella cartella corrente esiste già un file dinome nomeFile, viene aperto tale file. Altrimenti, viene creato un nuovo file con il nome specificato
 
                     out.println("--NO_READ--");
                     try {
@@ -77,7 +78,7 @@ public class SendTask implements Runnable{
 
                         logDate = logDateFormatter.format(LocalDateTime.now());
 
-                        writeFile(user.getUserEmail(), false, out);
+                        writeFile(user.getUserEmail(), false, out);             // chiamo il metodo writeFile e faccio la scrittura dei dati
                         writeFile(receivers, false, out);
                         writeFile(object, false, out);
                         writeFile(logDate, false, out);
@@ -87,12 +88,12 @@ public class SendTask implements Runnable{
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     } finally {
-                        user.getReadWrite().release();
+                        user.getReadWrite().release();              //accedo alla sezione critica
                     }
 
-                    sendToReceivers();
+                    sendToReceivers();                              //chiamo il metodo per receiver    
 
-                    logThreads.execute(new LogTask(sendSem, getClass().getResource("../resources/log/send/" + user.getUserEmail()).getPath(), "send email", logDate));
+                    logThreads.execute(new LogTask(sendSem, Objects.requireNonNull(getClass().getResource("../resources/log/send/" + user.getUserEmail())).getPath(), "send email", logDate));
 
                     response = "send_correct";
 
@@ -100,16 +101,12 @@ public class SendTask implements Runnable{
 
                     logDate = logDateFormatter.format(LocalDateTime.now());
 
-                    logThreads.execute(new LogTask(errorSendSem, getClass().getResource("../resources/log/errorSend/" + user.getUserEmail()).getPath(), "send to wrong address", logDate));
+                    logThreads.execute(new LogTask(errorSendSem, Objects.requireNonNull(getClass().getResource("../resources/log/errorSend/" + user.getUserEmail())).getPath(), "send to wrong address", logDate));
 
                     response = "send_error";
 
                 }
             }
-
-            logDate = logDateFormatter.format(LocalDateTime.now());
-
-            logThreads.execute(new LogTask(connectionSem, getClass().getResource("../resources/log/connection/" + user.getUserEmail()).getPath(), "close send connection", logDate));
 
         } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
@@ -127,7 +124,7 @@ public class SendTask implements Runnable{
         }
     }
 
-    private void checkAddress(String receivers){    //chiamato dalla run
+    private void checkAddress(String receivers){
 
         int start=0;
         int end = 0;
@@ -143,14 +140,15 @@ public class SendTask implements Runnable{
             else
                 receiver = receivers.substring(start);
 
-            String user_folder_path = getClass().getResource("../resources/userClients/").getPath();    //#? sul nuovo versione si chiama unserinbox
+            String user_folder_path = Objects.requireNonNull(getClass().getResource("../resources/userInbox/")).getPath();
 
             File folder = new File( user_folder_path + "/" + receiver);
 
-            if(receiver.equals(user.getUserEmail()) || !folder.isDirectory()){
-                wrongAddress += receiver + " ";
+            if(receiver.equals(user.getUserEmail()) || !folder.isDirectory()){                               //se non e presente il directory oppure send=reciver
+                wrongAddress += receiver + " ";                                                             //aggiungo gli indirizzi non trovati
             } else {
-                listReceivers.add(receiver);
+                if(!listReceivers.contains(receiver))
+                    listReceivers.add(receiver);                                                            //se non ce nella lista receivers allora aggiungilo nella lista
             }
 
             start = end+1;
@@ -174,15 +172,15 @@ public class SendTask implements Runnable{
 
     private void sendToReceivers() throws IOException, URISyntaxException {
 
-        for (int i = 0; i < listReceivers.size(); i++) {
+        for (int i = 0; i < listReceivers.size(); i++) {                                                //salvo dentro la lista dei reciver che devono ricevere email
 
 
-            String file_receiver_path = getClass().getResource("../resources/userClients/" + listReceivers.get(i) + "/receivedEmails/").getPath();
+            String file_receiver_path = Objects.requireNonNull(getClass().getResource("../resources/userInbox/" + listReceivers.get(i) + "/receivedEmails/")).getPath();
             File file_receiver = new File(file_receiver_path + file_send.getName() + "_" + user.getUserEmail() + ".txt");
 
-            if(file_receiver.createNewFile()) {
+            if(file_receiver.createNewFile()) {                                                         //creo il file
 
-                file_receiver.createNewFile();
+                //file_receiver.createNewFile();
                 FileChannel from = new FileInputStream(file_send).getChannel();
                 FileChannel receiver = new FileOutputStream(file_receiver).getChannel();
 
@@ -193,27 +191,27 @@ public class SendTask implements Runnable{
 
                 logDate = logDateFormatter.format(LocalDateTime.now());
 
-                logThreads.execute(new LogTask(receivedSem, getClass().getResource("../resources/log/received/" + listReceivers.get(i)).getPath(), "received email", logDate));
+                logThreads.execute(new LogTask(receivedSem, Objects.requireNonNull(getClass().getResource("../resources/log/received/" + listReceivers.get(i))).getPath(), "received email", logDate));
 
-            }else{
+            }else{  //se non riesce creare il file faccio il log del errore
                 logDate = logDateFormatter.format(LocalDateTime.now());
 
-                logThreads.execute(new LogTask(errorSendSem, getClass().getResource("../resources/log/errorSend/" + user.getUserEmail()).getPath(), "error send to receiver", logDate));
+                logThreads.execute(new LogTask(errorSendSem, Objects.requireNonNull(getClass().getResource("../resources/log/errorSend/" + user.getUserEmail())).getPath(), "error send to receiver", logDate));
 
             }
         }
 
-        if(wrongAddress.length() > 0){
+        if(wrongAddress.length() > 0){                          // vado stampare errore nel caso email non e stato trovato
 
             logDate = logDateFormatter.format(LocalDateTime.now());
 
-            logThreads.execute(new LogTask(errorSendSem, getClass().getResource("../resources/log/errorSend/" + user.getUserEmail()).getPath(), "send to wrong address", logDate));
+            logThreads.execute(new LogTask(errorSendSem, Objects.requireNonNull(getClass().getResource("../resources/log/errorSend/" + user.getUserEmail())).getPath(), "send to wrong address", logDate));
 
             wrongAddress = wrongAddress.replace(" ", "\n");
 
             fileDate = fileDateFormatter.format(LocalDateTime.now());
 
-            String sender_path = getClass().getResource("../resources/userClients/" +user.getUserEmail()+"/receivedEmails/").getPath();
+            String sender_path = Objects.requireNonNull(getClass().getResource("../resources/userInbox/" + user.getUserEmail() + "/receivedEmails/")).getPath();
 
             File file_error;
 
@@ -229,7 +227,7 @@ public class SendTask implements Runnable{
             writeFile(user.getUserEmail(), false, out);
             writeFile("Indirizzi email errati", false, out);
             writeFile(logDate, false, out);
-            writeFile("Nella mail con oggetto \""+object+"\", i seguenti indirizzi email sono errati: \n\n"+wrongAddress+"\n\nN:B:: si prega di non rispondere a questa email.", true, out);
+            writeFile("Nella mail con oggetto \""+object+"\", iseguenti indirizzi email sono errati: \n\n"+wrongAddress+"\n\nN:B:: si prega di non rispondere a questa email.", true, out);
 
             out.close();
         }
